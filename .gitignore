@@ -39,8 +39,9 @@ tmp/
 temp/
 *.tmp
 
-# Local documentation
+# Local documentation (except plans)
 docs/
+!docs/plans/
 
 # ===================
 # AI Agent Files
