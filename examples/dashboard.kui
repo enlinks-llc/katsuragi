@@ -1,0 +1,14 @@
+ratio: 16:9
+grid: 4x3
+
+// Navigation
+A1: { type: img, alt: "Logo" }
+B1..C1: { type: txt, value: "Dashboard", align: center }
+D1: { type: btn, value: "Logout", style: secondary }
+
+// Sidebar
+A2..A3: { type: box, style: default }
+
+// Main content area
+B2..D2: { type: txt, value: "Welcome back!", align: left }
+B3..D3: { type: box, style: secondary }
