@@ -1,0 +1,95 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+out/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Test coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Local documentation
+docs/
+
+# ===================
+# AI Agent Files
+# ===================
+
+# Claude Code
+.claude/
+.claude.json
+.claude-*
+
+# Cursor
+.cursor/
+.cursorignore
+.cursorrules
+
+# Aider
+.aider*
+.aider.chat.history.md
+.aider.input.history
+
+# Continue
+.continue/
+.continuerc.json
+
+# Codeium
+.codeium/
+
+# GitHub Copilot
+.copilot/
+.copilot-*
+
+# Windsurf
+.windsurf/
+
+# Tabnine
+.tabnine/
+
+# Amazon CodeWhisperer / Q
+.aws/codewhisperer/
+.amazonq/
+
+# Sourcegraph Cody
+.cody/
+.sourcegraph/
+
+# JetBrains AI
+.junie/
+
+# Other AI tools
+.ai/
+.llm/
+.gpt/
