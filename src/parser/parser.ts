@@ -74,7 +74,7 @@ export function parse(input: string): KuiDocument {
     return [parseInt(parts[0], 10), parseInt(parts[1], 10)];
   }
 
-  function parseProps(): ComponentProps {
+  function parseProps(): Record<string, string> {
     expect(TokenType.LBRACE);
     skipNewlines();
 
@@ -109,7 +109,7 @@ export function parse(input: string): KuiDocument {
     }
 
     expect(TokenType.RBRACE);
-    return props as unknown as ComponentProps;
+    return props;
   }
 
   function parseComponent(cellToken: Token): Component {
@@ -134,18 +134,15 @@ export function parse(input: string): KuiDocument {
     }
 
     // Apply defaults
-    const props: ComponentProps = {
-      ...rawProps,
-      align: (rawProps.align as Align) || 'left',
-      style: (rawProps.style as Style) || 'default',
-    };
+    const align = (rawProps.align as Align) || 'left';
+    const style = (rawProps.style as Style) || 'default';
 
     // Validate align and style
-    if (props.align && !VALID_ALIGNS.has(props.align)) {
-      throw new Error(`Invalid align value: ${props.align}`);
+    if (!VALID_ALIGNS.has(align)) {
+      throw new Error(`Invalid align value: ${align}`);
     }
-    if (props.style && !VALID_STYLES.has(props.style)) {
-      throw new Error(`Invalid style value: ${props.style}`);
+    if (!VALID_STYLES.has(style)) {
+      throw new Error(`Invalid style value: ${style}`);
     }
 
     // Check for overlap with existing components
@@ -157,13 +154,20 @@ export function parse(input: string): KuiDocument {
       }
     }
 
-    // Remove 'type' from props as it's stored separately
-    const { type: _, ...restProps } = props as ComponentProps & { type?: string };
+    // Build props without 'type'
+    const props: ComponentProps = {
+      value: rawProps.value,
+      label: rawProps.label,
+      align,
+      style,
+      src: rawProps.src,
+      alt: rawProps.alt,
+    };
 
     return {
       type: componentType,
       range,
-      props: restProps as ComponentProps,
+      props,
     };
   }
 
