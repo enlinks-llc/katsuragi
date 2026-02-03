@@ -8,7 +8,10 @@
   "bin": {
     "katsuragi": "./dist/cli.js"
   },
-  "files": ["dist", "examples"],
+  "files": [
+    "dist",
+    "examples"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/cli.ts",
@@ -17,7 +20,13 @@
     "format": "biome format --write src tests",
     "check": "biome check --write src tests"
   },
-  "keywords": ["wireframe", "ui", "svg", "png", "design"],
+  "keywords": [
+    "wireframe",
+    "ui",
+    "svg",
+    "png",
+    "design"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
