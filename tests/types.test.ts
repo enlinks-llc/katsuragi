@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { KuiDocument, CellRange, Component, Metadata } from '../src/types';
+import type { KuiDocument, CellRange, Component } from '../src/types';
 
 describe('Type definitions', () => {
   it('should define KuiDocument structure', () => {
