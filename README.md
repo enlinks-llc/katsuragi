@@ -276,7 +276,12 @@ Katsuragi is built on the shoulders of giants:
 
 ---
 
-If you find Katsuragi useful, please star this repo!
+## Support
+
+If you find Katsuragi useful:
+
+- Star this repo
+- [Buy us a coffee](https://buymeacoffee.com/enlinks)
 
 ---
 

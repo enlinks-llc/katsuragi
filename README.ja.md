@@ -276,7 +276,12 @@ Katsuragiは多くの素晴らしいオープンソースプロジェクトの�
 
 ---
 
-Katsuragiが気に入ったら、ぜひStarをお願いします！
+## サポート
+
+Katsuragiが気に入ったら:
+
+- このリポジトリにStarをお願いします
+- [コーヒーをおごる](https://buymeacoffee.com/enlinks)
 
 ---
 
