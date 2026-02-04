@@ -33,7 +33,7 @@ Katsuragi uses a text format because **AI can read and write it**.
 1. **Add .kui spec to your project** (in `AGENTS.md`, system prompt, or project docs)
 2. Ask AI: "Create a login wireframe in .kui format"
 3. AI generates the .kui file
-4. Run `katsuragi login.kui -o login.png`
+4. Run `ktr login.kui -o login.png`
 5. Share the image, discuss, iterate
 6. AI updates the .kui based on feedback
 
@@ -62,8 +62,14 @@ Once the AI knows the format, it can generate and modify .kui code reliably.
 ### Install
 
 ```bash
+# One-time use (no install)
+npx ktr input.kui -o output.png
+
+# Global install
 npm install -g katsuragi
 ```
+
+> **Tip:** `ktr` is a shorter alias for `katsuragi` - use whichever you prefer.
 
 ### Try It
 
@@ -83,12 +89,32 @@ katsuragi hello.kui -o hello.png
 ### Usage
 
 ```bash
-# Generate SVG
-katsuragi input.kui -o output.svg
+# Output SVG to stdout
+ktr input.kui
 
-# Generate PNG
-katsuragi input.kui -o output.png
+# Save to file (format auto-detected from extension)
+ktr input.kui -o output.svg
+ktr input.kui -o output.png
+
+# Explicit format
+ktr input.kui -f png -o output.png
+
+# Batch conversion
+ktr *.kui -d ./output -f png
+
+# Read from stdin
+cat input.kui | ktr -o output.png
 ```
+
+**CLI Options:**
+
+| Option | Description |
+|--------|-------------|
+| `-o, --output <file>` | Output file (default: stdout for SVG) |
+| `-d, --output-dir <dir>` | Output directory for batch conversion |
+| `-f, --format <format>` | Output format: `svg` or `png` (default: `svg`) |
+| `-V, --version` | Show version number |
+| `-h, --help` | Show help |
 
 ## .kui File Format
 

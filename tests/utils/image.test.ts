@@ -40,6 +40,11 @@ describe('image utilities', () => {
       expect(resolveImagePath(absPath, '/some/base')).toBe(absPath);
     });
 
+    test('allows absolute path without basePath', () => {
+      const absPath = '/absolute/path/to/image.png';
+      expect(resolveImagePath(absPath)).toBe(absPath);
+    });
+
     test('resolves relative path with basePath', () => {
       const resolved = resolveImagePath('./image.png', '/base/path');
       expect(resolved).toBe('/base/path/image.png');
@@ -47,6 +52,39 @@ describe('image utilities', () => {
 
     test('throws when relative path has no basePath', () => {
       expect(() => resolveImagePath('./image.png')).toThrow(/base path/i);
+    });
+
+    test('throws on path traversal attack', () => {
+      expect(() => resolveImagePath('../../../etc/passwd', '/base/path')).toThrow(/escapes base directory/i);
+    });
+
+    // Edge cases
+    test('resolves relative path without ./ prefix', () => {
+      const resolved = resolveImagePath('subdir/image.png', '/base/path');
+      expect(resolved).toBe('/base/path/subdir/image.png');
+    });
+
+    test('allows intermediate .. that stays within basePath', () => {
+      const resolved = resolveImagePath('foo/../bar/image.png', '/base/path');
+      expect(resolved).toBe('/base/path/bar/image.png');
+    });
+
+    test('throws on sneaky traversal with intermediate ..', () => {
+      expect(() => resolveImagePath('./foo/../../etc/passwd', '/base/path')).toThrow(/escapes base directory/i);
+    });
+
+    test('handles basePath with trailing slash', () => {
+      const resolved = resolveImagePath('./image.png', '/base/path/');
+      expect(resolved).toBe('/base/path/image.png');
+    });
+
+    test('resolves to basePath itself with . path', () => {
+      const resolved = resolveImagePath('.', '/base/path');
+      expect(resolved).toBe('/base/path');
+    });
+
+    test('throws on single .. traversal', () => {
+      expect(() => resolveImagePath('..', '/base/path')).toThrow(/escapes base directory/i);
     });
   });
 

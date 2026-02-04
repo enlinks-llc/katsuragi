@@ -6,7 +6,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "katsuragi": "./dist/cli.js"
+    "katsuragi": "./dist/cli.js",
+    "ktr": "./dist/cli.js"
   },
   "files": [
     "dist",
@@ -27,8 +28,19 @@
     "png",
     "design"
   ],
-  "author": "",
+  "author": "En-Links LLC",
   "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enlinks-llc/katsuragi.git"
+  },
+  "homepage": "https://github.com/enlinks-llc/katsuragi#readme",
+  "bugs": {
+    "url": "https://github.com/enlinks-llc/katsuragi/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "commander": "^14.0.3",
     "sharp": "^0.34.5"

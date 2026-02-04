@@ -8,13 +8,25 @@ export interface ImageData {
 }
 
 export function resolveImagePath(src: string, basePath?: string): string {
+  // Absolute paths are allowed as-is
   if (path.isAbsolute(src)) {
     return src;
   }
+
+  // Relative paths require basePath
   if (!basePath) {
     throw new Error(`Cannot resolve relative image path without base path: ${src}`);
   }
-  return path.resolve(basePath, src);
+
+  const normalizedBase = path.resolve(basePath);
+  const resolved = path.resolve(normalizedBase, src);
+
+  // Prevent path traversal attacks (../ escaping basePath)
+  if (!resolved.startsWith(normalizedBase + path.sep) && resolved !== normalizedBase) {
+    throw new Error(`Image path escapes base directory: ${src}`);
+  }
+
+  return resolved;
 }
 
 function getMimeType(ext: string): string {
