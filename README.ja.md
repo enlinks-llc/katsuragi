@@ -1,22 +1,84 @@
 # Katsuragi
 
-テキストベースのUIワイヤーフレーム生成ツール。シンプルなグリッドベースのDSLでレイアウトを定義し、SVG/PNGに出力します。
+[![npm version](https://badge.fury.io/js/katsuragi.svg)](https://www.npmjs.com/package/katsuragi)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
-## 特徴
+**AIが読み書きできるワイヤーフレーム**
 
-- グリッドベースのレイアウトシステム（Excelのセル参照のような記法）
-- シンプルなJSON風のコンポーネント定義
-- SVG/PNG出力対応（長辺1280px）
-- 技術者から非技術者へのUI共有に最適
-- LLMとの協調的なUI開発に適したフォーマット
+テキストでUIレイアウトを記述。ChatGPTやClaudeと一緒にワイヤーフレームを作り、レビューし、改善できます。
 
-## インストール
+![ログイン画面のワイヤーフレーム例](./docs/images/login.png)
+
+## なぜテキストベース？
+
+Katsuagiがテキスト形式なのは、**AIが読み書きできる**からです。
+
+| 従来のツール | Katsuragi |
+|-------------|-----------|
+| Figmaでデザイン → エクスポート → 共有 | テキストで記述 → 画像生成 |
+| AIはデザインファイルを編集できない | AIは.kuiファイルを生成・修正できる |
+| 「ボタンを大きく」は手作業 | AIがコードを理解して更新 |
+
+### なぜプレーンテキストがAIと相性がいいのか
+
+- **コピペが簡単** - バイナリ形式も専用ツールも不要
+- **コンテキストウィンドウに収まる** - .kuiファイルは小さく、AIがレイアウト全体を保持可能
+- **diffフレンドリー** - gitで変更追跡可能、レビューも簡単
+- **ベンダーロックインなし** - どのLLMでも動作（ChatGPT、Claude、Gemini、ローカルモデル）
+
+### AIとのワークフロー
+
+1. **プロジェクトに.kui仕様を追加**（`AGENTS.md`、システムプロンプト、プロジェクトドキュメントなど）
+2. AIに依頼：「ログイン画面のワイヤーを.kui形式で」
+3. AIが.kuiファイルを生成
+4. `katsuragi login.kui -o login.png` で画像化
+5. 画像を共有、議論、改善
+6. フィードバックをもとにAIが.kuiを更新
+
+### LLM系CLIツールとの連携
+
+- **Claude Code** - CLAUDE.mdに仕様を追加
+- **Cursor** - プロジェクトルールに追加
+- **Aider** - コンテキストに含める
+- **その他のLLM CLI** - システムプロンプトやAGENTS.mdにペースト
+
+### プロンプト例
+
+```
+以下は.kuiファイルの形式仕様です：
+[下記の構文セクションをペースト]
+
+タスク管理アプリのモバイル画面ワイヤーフレームを作成してください。
+2x5グリッド（ratio 9:16）を使用。
+ヘッダー（タイトル）、タスクリストエリア、フローティングアクションボタンを配置。
+```
+
+AIが仕様を理解すれば、.kuiコードを正確に生成・修正できます。
+
+## クイックスタート
+
+### インストール
 
 ```bash
 npm install -g katsuragi
 ```
 
-## 使い方
+### 試してみる
+
+```bash
+# サンプルファイルを作成
+cat > hello.kui << 'EOF'
+ratio: 16:9
+grid: 2x2
+A1: { type: txt, value: "Hello Katsuragi!", align: center }
+A2..B2: { type: btn, value: "はじめる" }
+EOF
+
+# 画像生成
+katsuragi hello.kui -o hello.png
+```
+
+### 使い方
 
 ```bash
 # SVG出力
@@ -58,7 +120,7 @@ D3: { type: btn, value: "送信", bg: $primary }
 A1: { type: txt, value: "Hello" }  // 行末コメント
 ```
 
-### コンポーネント（MVP）
+### コンポーネント
 
 | タイプ | 説明 | プロパティ | デフォルト |
 |--------|------|------------|------------|
@@ -123,9 +185,15 @@ A1: { type: txt, value: `
 - `1:1` → 1280 × 1280
 - `9:16` → 720 × 1280（モバイル向け）
 
+## その他の例
+
+![ダッシュボードのワイヤーフレーム](./docs/images/dashboard.png)
+
+![モバイルのワイヤーフレーム](./docs/images/mobile.png)
+
 ## ロードマップ
 
-- [x] MVP: 基本コンポーネント（txt, box, btn, input, img）
+- [x] 基本コンポーネント（txt, box, btn, input, img）
 - [x] SVG/PNG出力
 - [ ] Markdown埋め込み対応（` ```kui ` コードブロック）
 - [ ] HTML出力
@@ -138,3 +206,7 @@ A1: { type: txt, value: `
 - **商用利用**: SaaS組み込み・クローズドソースは商用ライセンスが必要
 
 商用ライセンスについては [En-Links LLC](https://github.com/enlinks-llc) までお問い合わせください。
+
+---
+
+Katsuagiが気に入ったら、ぜひStarをお願いします！

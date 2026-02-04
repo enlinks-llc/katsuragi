@@ -2,23 +2,85 @@
 
 [日本語版 README](./README.ja.md)
 
-Text-based UI wireframe generator. Define layouts with a simple grid-based DSL and export to SVG/PNG.
+[![npm version](https://badge.fury.io/js/katsuragi.svg)](https://www.npmjs.com/package/katsuragi)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
-## Features
+**Wireframes that AI can read and write.**
 
-- Grid-based layout system (like Excel cell references)
-- Simple JSON-style component definitions
-- SVG/PNG export (1280px longest edge)
-- Designed for developer-to-non-developer communication
-- AI-friendly format for collaborative UI development with LLMs
+Describe your UI layout in a simple text format. Let ChatGPT, Claude, or any LLM generate, review, and iterate on wireframes with you.
 
-## Installation
+![Login wireframe example](./docs/images/login.png)
+
+## Why Text-Based?
+
+Katsuragi uses a text format because **AI can read and write it**.
+
+| Traditional Tools | Katsuragi |
+|-------------------|-----------|
+| Design in Figma, export, share screenshot | Describe in text, generate image |
+| AI can't edit your design file | AI can write and modify .kui files |
+| "Make the button bigger" requires manual work | AI understands and updates the code |
+
+### Why Plain Text Works with AI
+
+- **Easy to copy/paste** - No binary format, no special tools needed
+- **Fits in context windows** - .kui files are small, AI can hold entire layouts in memory
+- **Diff-friendly** - Changes are trackable in git, easy to review
+- **No vendor lock-in** - Works with any LLM (ChatGPT, Claude, Gemini, local models)
+
+### Workflow with AI
+
+1. **Add .kui spec to your project** (in `AGENTS.md`, system prompt, or project docs)
+2. Ask AI: "Create a login wireframe in .kui format"
+3. AI generates the .kui file
+4. Run `katsuragi login.kui -o login.png`
+5. Share the image, discuss, iterate
+6. AI updates the .kui based on feedback
+
+### Works with LLM-powered CLI Tools
+
+- **Claude Code** - Add spec to CLAUDE.md
+- **Cursor** - Add to project rules
+- **Aider** - Include in context
+- **Any LLM CLI** - Paste spec in system prompt or AGENTS.md
+
+### Example Prompt
+
+```
+Here's the .kui format specification:
+[paste the syntax section below]
+
+Create a mobile app wireframe for a task management app.
+Use 2x5 grid (ratio 9:16).
+Include: header with title, task list area, and floating action button.
+```
+
+Once the AI knows the format, it can generate and modify .kui code reliably.
+
+## Quick Start
+
+### Install
 
 ```bash
 npm install -g katsuragi
 ```
 
-## Usage
+### Try It
+
+```bash
+# Create a sample file
+cat > hello.kui << 'EOF'
+ratio: 16:9
+grid: 2x2
+A1: { type: txt, value: "Hello Katsuragi!", align: center }
+A2..B2: { type: btn, value: "Get Started" }
+EOF
+
+# Generate image
+katsuragi hello.kui -o hello.png
+```
+
+### Usage
 
 ```bash
 # Generate SVG
@@ -60,7 +122,7 @@ Use `//` for comments:
 A1: { type: txt, value: "Hello" }  // End-of-line comment
 ```
 
-### Components (MVP)
+### Components
 
 | Type | Description | Properties | Defaults |
 |------|-------------|------------|----------|
@@ -99,7 +161,7 @@ Color formats:
 
 ### Multi-line Text
 
-Use `\n` for line breaks in text values:
+Use `\n` for line breaks:
 
 ```kui
 A1: { type: txt, value: "Line 1\nLine 2\nLine 3" }
@@ -125,10 +187,16 @@ The longest edge is fixed at 1280px. The shorter edge is calculated from the rat
 - `1:1` → 1280 × 1280
 - `9:16` → 720 × 1280 (mobile)
 
+## More Examples
+
+![Dashboard wireframe](./docs/images/dashboard.png)
+
+![Mobile wireframe](./docs/images/mobile.png)
+
 ## Roadmap
 
-- [x] MVP: Core components (txt, box, btn, input, img)
-- [ ] SVG/PNG export
+- [x] Core components (txt, box, btn, input, img)
+- [x] SVG/PNG export
 - [ ] Markdown embedding (` ```kui ` code blocks)
 - [ ] HTML export
 - [ ] VS Code extension
@@ -140,3 +208,7 @@ The longest edge is fixed at 1280px. The shorter edge is calculated from the rat
 - **Commercial**: License required for SaaS integration or closed-source use
 
 For commercial licensing, contact [En-Links LLC](https://github.com/enlinks-llc).
+
+---
+
+If you find Katsuragi useful, please star this repo!

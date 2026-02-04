@@ -42,9 +42,6 @@ temp/
 # Sandbox (for testing)
 sandbox/
 
-# Local documentation (except plans)
-docs/
-!docs/plans/
 
 # ===================
 # AI Agent Files
