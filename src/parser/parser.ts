@@ -7,9 +7,11 @@ import type {
   CellRange,
   Align,
   Style,
+  SourceLocation,
 } from '../types.js';
 import { TokenType, tokenize, type Token } from './lexer.js';
 import { parseCellRange } from './cellRef.js';
+import { KuiSyntaxError } from './errors.js';
 
 const VALID_COMPONENT_TYPES = new Set<ComponentType>([
   'txt',
@@ -35,22 +37,28 @@ function rangesOverlap(a: CellRange, b: CellRange): boolean {
 function validateRangeWithinGrid(
   range: CellRange,
   grid: [number, number],
-  rangeStr: string
+  rangeStr: string,
+  loc: SourceLocation,
+  source: string
 ): void {
   const [cols, rows] = grid;
 
   // Check column bounds (0-indexed, so max valid is cols-1)
   if (range.start.col >= cols || range.end.col >= cols) {
     const maxCol = String.fromCharCode('A'.charCodeAt(0) + cols - 1);
-    throw new Error(
-      `Cell "${rangeStr}" exceeds column bounds. Grid is ${cols}x${rows}, valid columns: A-${maxCol}`
+    throw new KuiSyntaxError(
+      `Cell "${rangeStr}" exceeds column bounds. Grid is ${cols}x${rows}, valid columns: A-${maxCol}`,
+      loc,
+      source
     );
   }
 
   // Check row bounds (0-indexed, so max valid is rows-1)
   if (range.start.row >= rows || range.end.row >= rows) {
-    throw new Error(
-      `Cell "${rangeStr}" exceeds row bounds. Grid is ${cols}x${rows}, valid rows: 1-${rows}`
+    throw new KuiSyntaxError(
+      `Cell "${rangeStr}" exceeds row bounds. Grid is ${cols}x${rows}, valid rows: 1-${rows}`,
+      loc,
+      source
     );
   }
 }
@@ -65,12 +73,14 @@ export function parse(input: string): KuiDocument {
   };
   const components: Component[] = [];
 
+  const defaultLoc: SourceLocation = { line: 1, column: 1, offset: 0 };
+
   function peek(offset = 0): Token {
-    return tokens[pos + offset] ?? { type: TokenType.EOF, value: '' };
+    return tokens[pos + offset] ?? { type: TokenType.EOF, value: '', loc: defaultLoc };
   }
 
   function advance(): Token {
-    return tokens[pos++] ?? { type: TokenType.EOF, value: '' };
+    return tokens[pos++] ?? { type: TokenType.EOF, value: '', loc: defaultLoc };
   }
 
   function skipNewlines(): void {
@@ -79,10 +89,14 @@ export function parse(input: string): KuiDocument {
     }
   }
 
+  function syntaxError(message: string, loc: SourceLocation): KuiSyntaxError {
+    return new KuiSyntaxError(message, loc, input);
+  }
+
   function expect(type: TokenType): Token {
     const token = advance();
     if (token.type !== type) {
-      throw new Error(`Expected ${type}, got ${token.type}`);
+      throw syntaxError(`Expected ${type}, got ${token.type}`, token.loc);
     }
     return token;
   }
@@ -117,8 +131,10 @@ export function parse(input: string): KuiDocument {
         value = advance().value;
       } else if (nextToken.type === TokenType.IDENTIFIER) {
         value = advance().value;
+      } else if (nextToken.type === TokenType.NUMBER) {
+        value = advance().value;
       } else {
-        throw new Error(`Unexpected token ${nextToken.type} for property value`);
+        throw syntaxError(`Unexpected token ${nextToken.type} for property value`, nextToken.loc);
       }
 
       props[key] = value;
@@ -148,12 +164,12 @@ export function parse(input: string): KuiDocument {
     const rawProps = parseProps();
 
     if (!rawProps.type) {
-      throw new Error('Component missing type property');
+      throw syntaxError('Component missing type property', cellToken.loc);
     }
 
     const componentType = rawProps.type as ComponentType;
     if (!VALID_COMPONENT_TYPES.has(componentType)) {
-      throw new Error(`Invalid component type: ${componentType}`);
+      throw syntaxError(`Invalid component type: ${componentType}`, cellToken.loc);
     }
 
     // Apply defaults
@@ -162,17 +178,18 @@ export function parse(input: string): KuiDocument {
 
     // Validate align and style
     if (!VALID_ALIGNS.has(align)) {
-      throw new Error(`Invalid align value: ${align}`);
+      throw syntaxError(`Invalid align value: ${align}`, cellToken.loc);
     }
     if (!VALID_STYLES.has(style)) {
-      throw new Error(`Invalid style value: ${style}`);
+      throw syntaxError(`Invalid style value: ${style}`, cellToken.loc);
     }
 
     // Check for overlap with existing components
     for (const existing of components) {
       if (rangesOverlap(existing.range, range)) {
-        throw new Error(
-          `Cell overlap detected: ${rangeStr} overlaps with existing component`
+        throw syntaxError(
+          `Cell overlap detected: ${rangeStr} overlaps with existing component`,
+          cellToken.loc
         );
       }
     }
@@ -185,6 +202,7 @@ export function parse(input: string): KuiDocument {
       style,
       src: rawProps.src,
       alt: rawProps.alt,
+      padding: rawProps.padding ? parseInt(rawProps.padding, 10) : undefined,
     };
 
     return {
@@ -203,7 +221,8 @@ export function parse(input: string): KuiDocument {
 
     // Metadata: ratio or grid
     if (token.type === TokenType.IDENTIFIER) {
-      const name = advance().value.toLowerCase();
+      const identToken = advance();
+      const name = identToken.value.toLowerCase();
       expect(TokenType.COLON);
 
       if (name === 'ratio') {
@@ -212,8 +231,14 @@ export function parse(input: string): KuiDocument {
       } else if (name === 'grid') {
         const gridToken = expect(TokenType.GRID);
         metadata.grid = parseGrid(gridToken.value);
+      } else if (name === 'gap') {
+        const numToken = expect(TokenType.NUMBER);
+        metadata.gap = parseInt(numToken.value, 10);
+      } else if (name === 'padding') {
+        const numToken = expect(TokenType.NUMBER);
+        metadata.padding = parseInt(numToken.value, 10);
       } else {
-        throw new Error(`Unknown metadata: ${name}`);
+        throw syntaxError(`Unknown metadata: ${name}`, identToken.loc);
       }
       continue;
     }
@@ -222,7 +247,7 @@ export function parse(input: string): KuiDocument {
     if (token.type === TokenType.CELL_REF || token.type === TokenType.CELL_RANGE) {
       advance();
       const component = parseComponent(token);
-      validateRangeWithinGrid(component.range, metadata.grid, token.value);
+      validateRangeWithinGrid(component.range, metadata.grid, token.value, token.loc, input);
       components.push(component);
       continue;
     }

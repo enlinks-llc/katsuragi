@@ -1,9 +1,9 @@
-import type { Component, LayoutRect, Align, Style } from '../types.js';
+import type { Component, LayoutRect, Align, Style, RenderContext } from '../types.js';
+import { resolveImagePath, loadImageAsDataUri } from '../utils/image.js';
 
 const STROKE_WIDTH = 2;
 const BORDER_RADIUS = 8;
 const FONT_SIZE = 24;
-const PADDING = 16;
 
 function getTextAnchor(align: Align): string {
   switch (align) {
@@ -17,13 +17,14 @@ function getTextAnchor(align: Align): string {
 }
 
 function getTextX(rect: LayoutRect, align: Align): number {
+  const padding = rect.padding;
   switch (align) {
     case 'center':
       return rect.x + rect.width / 2;
     case 'right':
-      return rect.x + rect.width - PADDING;
+      return rect.x + rect.width - padding;
     default:
-      return rect.x + PADDING;
+      return rect.x + padding;
   }
 }
 
@@ -114,18 +115,18 @@ export function renderBtn(component: Component, rect: LayoutRect): string {
 
 export function renderInput(component: Component, rect: LayoutRect): string {
   const label = component.props.label ?? '';
-  const labelY = rect.y + PADDING + FONT_SIZE / 2;
-  const inputY = rect.y + PADDING + FONT_SIZE + 8;
-  const inputHeight = rect.height - PADDING * 2 - FONT_SIZE - 8;
+  const padding = rect.padding;
+  const labelY = rect.y + padding + FONT_SIZE / 2;
+  const inputY = rect.y + padding + FONT_SIZE + 8;
+  const inputHeight = rect.height - padding * 2 - FONT_SIZE - 8;
 
   return `<g>
-  <text x="${rect.x + PADDING}" y="${labelY}" font-size="${FONT_SIZE * 0.75}" fill="black">${escapeXml(label)}</text>
-  <rect x="${rect.x + PADDING}" y="${inputY}" width="${rect.width - PADDING * 2}" height="${Math.max(inputHeight, 40)}" rx="${BORDER_RADIUS / 2}" fill="white" stroke="black" stroke-width="${STROKE_WIDTH}"/>
+  <text x="${rect.x + padding}" y="${labelY}" font-size="${FONT_SIZE * 0.75}" fill="black">${escapeXml(label)}</text>
+  <rect x="${rect.x + padding}" y="${inputY}" width="${rect.width - padding * 2}" height="${Math.max(inputHeight, 40)}" rx="${BORDER_RADIUS / 2}" fill="white" stroke="black" stroke-width="${STROKE_WIDTH}"/>
 </g>`;
 }
 
-export function renderImg(component: Component, rect: LayoutRect): string {
-  const alt = component.props.alt ?? component.props.src ?? 'image';
+function renderImgPlaceholder(rect: LayoutRect, alt: string): string {
   const textX = rect.x + rect.width / 2;
   const textY = rect.y + rect.height / 2 + FONT_SIZE / 3;
 
@@ -133,4 +134,28 @@ export function renderImg(component: Component, rect: LayoutRect): string {
   <rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="#f0f0f0" stroke="#ccc" stroke-width="${STROKE_WIDTH}"/>
   <text x="${textX}" y="${textY}" font-size="${FONT_SIZE}" text-anchor="middle" fill="#666">[IMG: ${escapeXml(alt)}]</text>
 </g>`;
+}
+
+export function renderImg(
+  component: Component,
+  rect: LayoutRect,
+  context?: RenderContext
+): string {
+  const { src, alt } = component.props;
+  const altText = alt ?? src ?? 'image';
+
+  // If no src or context, render placeholder
+  if (!src || !context?.basePath) {
+    return renderImgPlaceholder(rect, altText);
+  }
+
+  try {
+    const imagePath = resolveImagePath(src, context.basePath);
+    const { dataUri } = loadImageAsDataUri(imagePath);
+
+    return `<image x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" href="${dataUri}" preserveAspectRatio="xMidYMid meet"/>`;
+  } catch {
+    // Fallback to placeholder on error
+    return renderImgPlaceholder(rect, altText);
+  }
 }

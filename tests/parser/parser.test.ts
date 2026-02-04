@@ -191,4 +191,38 @@ C1: { type: txt, value: "out of bounds" }`;
       expect(() => parse(input)).toThrow(/column.*bounds/i);
     });
   });
+
+  describe('gap and padding metadata', () => {
+    test('parses gap setting', () => {
+      const input = 'gap: 8\nA1: { type: box }';
+      const doc = parse(input);
+      expect(doc.metadata.gap).toBe(8);
+    });
+
+    test('parses padding setting', () => {
+      const input = 'padding: 24\nA1: { type: box }';
+      const doc = parse(input);
+      expect(doc.metadata.padding).toBe(24);
+    });
+
+    test('parses both gap and padding', () => {
+      const input = 'gap: 10\npadding: 20\nA1: { type: box }';
+      const doc = parse(input);
+      expect(doc.metadata.gap).toBe(10);
+      expect(doc.metadata.padding).toBe(20);
+    });
+
+    test('parses per-cell padding override', () => {
+      const input = 'A1: { type: box, padding: 32 }';
+      const doc = parse(input);
+      expect(doc.components[0].props.padding).toBe(32);
+    });
+
+    test('gap and padding are optional (undefined by default)', () => {
+      const input = 'A1: { type: box }';
+      const doc = parse(input);
+      expect(doc.metadata.gap).toBeUndefined();
+      expect(doc.metadata.padding).toBeUndefined();
+    });
+  });
 });

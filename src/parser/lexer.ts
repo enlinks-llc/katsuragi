@@ -1,3 +1,5 @@
+import type { SourceLocation } from '../types.js';
+
 export const TokenType = {
   IDENTIFIER: 'IDENTIFIER',
   STRING: 'STRING',
@@ -19,6 +21,7 @@ export type TokenType = (typeof TokenType)[keyof typeof TokenType];
 export interface Token {
   type: TokenType;
   value: string;
+  loc: SourceLocation;
 }
 
 const CELL_REF_PATTERN = /^[A-Z]\d+$/i;
@@ -29,6 +32,8 @@ const GRID_PATTERN = /^\d+x\d+$/i;
 export function tokenize(input: string): Token[] {
   const tokens: Token[] = [];
   let pos = 0;
+  let line = 1;
+  let column = 1;
   let lastWasNewline = false;
 
   function peek(offset = 0): string {
@@ -36,7 +41,18 @@ export function tokenize(input: string): Token[] {
   }
 
   function advance(): string {
-    return input[pos++] ?? '';
+    const ch = input[pos++] ?? '';
+    if (ch === '\n') {
+      line++;
+      column = 1;
+    } else {
+      column++;
+    }
+    return ch;
+  }
+
+  function currentLocation(): SourceLocation {
+    return { line, column, offset: pos };
   }
 
   function skipWhitespace(): void {
@@ -53,7 +69,7 @@ export function tokenize(input: string): Token[] {
     }
   }
 
-  function readString(quote: string): string {
+  function readString(quote: string, startLoc: SourceLocation): string {
     advance(); // consume opening quote
     let value = '';
     while (pos < input.length && peek() !== quote) {
@@ -87,20 +103,20 @@ export function tokenize(input: string): Token[] {
       }
     }
     if (pos >= input.length) {
-      throw new Error('Unterminated string');
+      throw new Error(`Unterminated string at ${startLoc.line}:${startLoc.column}`);
     }
     advance(); // consume closing quote
     return value;
   }
 
-  function readBacktickString(): string {
+  function readBacktickString(startLoc: SourceLocation): string {
     advance(); // consume opening backtick
     let value = '';
     while (pos < input.length && peek() !== '`') {
       value += advance();
     }
     if (pos >= input.length) {
-      throw new Error('Unterminated string');
+      throw new Error(`Unterminated string at ${startLoc.line}:${startLoc.column}`);
     }
     advance(); // consume closing backtick
     return value;
@@ -150,12 +166,14 @@ export function tokenize(input: string): Token[] {
     if (pos >= input.length) break;
 
     const ch = peek();
+    const loc = currentLocation();
 
     // Newline
     if (ch === '\n') {
+      const newlineLoc = currentLocation();
       advance();
       if (!lastWasNewline) {
-        tokens.push({ type: TokenType.NEWLINE, value: '\n' });
+        tokens.push({ type: TokenType.NEWLINE, value: '\n', loc: newlineLoc });
         lastWasNewline = true;
       }
       continue;
@@ -171,52 +189,57 @@ export function tokenize(input: string): Token[] {
     // Punctuation
     if (ch === '{') {
       advance();
-      tokens.push({ type: TokenType.LBRACE, value: '{' });
+      tokens.push({ type: TokenType.LBRACE, value: '{', loc });
       continue;
     }
     if (ch === '}') {
       advance();
-      tokens.push({ type: TokenType.RBRACE, value: '}' });
+      tokens.push({ type: TokenType.RBRACE, value: '}', loc });
       continue;
     }
     if (ch === ',') {
       advance();
-      tokens.push({ type: TokenType.COMMA, value: ',' });
+      tokens.push({ type: TokenType.COMMA, value: ',', loc });
       continue;
     }
 
     // Strings
     if (ch === '"' || ch === "'") {
-      const value = readString(ch);
-      tokens.push({ type: TokenType.STRING, value });
+      const value = readString(ch, loc);
+      tokens.push({ type: TokenType.STRING, value, loc });
       continue;
     }
     if (ch === '`') {
-      const value = readBacktickString();
-      tokens.push({ type: TokenType.STRING, value });
+      const value = readBacktickString(loc);
+      tokens.push({ type: TokenType.STRING, value, loc });
       continue;
     }
 
     // Cell reference/range (starts with letter, might have ..)
     if (/[A-Z]/i.test(ch)) {
       const startPos = pos;
+      const startLine = line;
+      const startColumn = column;
       const value = readCellRefOrRange();
+      const startLoc = { line: startLine, column: startColumn, offset: startPos };
 
       // Check if it's a cell range
       if (CELL_RANGE_PATTERN.test(value)) {
-        tokens.push({ type: TokenType.CELL_RANGE, value: value.toUpperCase() });
+        tokens.push({ type: TokenType.CELL_RANGE, value: value.toUpperCase(), loc: startLoc });
         continue;
       }
       // Check if it's a cell ref
       if (CELL_REF_PATTERN.test(value)) {
-        tokens.push({ type: TokenType.CELL_REF, value: value.toUpperCase() });
+        tokens.push({ type: TokenType.CELL_REF, value: value.toUpperCase(), loc: startLoc });
         continue;
       }
       // Otherwise it's an identifier - but we need to handle the word properly
       // Reset and read as identifier
       pos = startPos;
+      line = startLine;
+      column = startColumn;
       const word = readWord();
-      tokens.push({ type: TokenType.IDENTIFIER, value: word });
+      tokens.push({ type: TokenType.IDENTIFIER, value: word, loc: startLoc });
       continue;
     }
 
@@ -224,11 +247,11 @@ export function tokenize(input: string): Token[] {
     if (/[0-9]/.test(ch)) {
       const value = readNumberOrRatioOrGrid();
       if (RATIO_PATTERN.test(value)) {
-        tokens.push({ type: TokenType.RATIO, value });
+        tokens.push({ type: TokenType.RATIO, value, loc });
       } else if (GRID_PATTERN.test(value)) {
-        tokens.push({ type: TokenType.GRID, value });
+        tokens.push({ type: TokenType.GRID, value, loc });
       } else {
-        tokens.push({ type: TokenType.NUMBER, value });
+        tokens.push({ type: TokenType.NUMBER, value, loc });
       }
       continue;
     }
@@ -236,14 +259,14 @@ export function tokenize(input: string): Token[] {
     // Colon
     if (ch === ':') {
       advance();
-      tokens.push({ type: TokenType.COLON, value: ':' });
+      tokens.push({ type: TokenType.COLON, value: ':', loc });
       continue;
     }
 
     // Unknown character
-    throw new Error(`Unexpected character: '${ch}' at position ${pos}`);
+    throw new Error(`Unexpected character: '${ch}' at ${loc.line}:${loc.column}`);
   }
 
-  tokens.push({ type: TokenType.EOF, value: '' });
+  tokens.push({ type: TokenType.EOF, value: '', loc: currentLocation() });
   return tokens;
 }

@@ -85,4 +85,114 @@ A1..D1: { type: txt, value: "Test", align: center }
       });
     }).toThrow();
   });
+
+  describe('batch conversion', () => {
+    test('converts multiple files to SVG', () => {
+      const file1 = path.join(tmpDir, 'batch1.kui');
+      const file2 = path.join(tmpDir, 'batch2.kui');
+      fs.writeFileSync(file1, 'A1: { type: txt, value: "One" }');
+      fs.writeFileSync(file2, 'A1: { type: txt, value: "Two" }');
+
+      execSync(`npx tsx src/cli.ts ${file1} ${file2}`, {
+        encoding: 'utf-8',
+      });
+
+      expect(fs.existsSync(path.join(tmpDir, 'batch1.svg'))).toBe(true);
+      expect(fs.existsSync(path.join(tmpDir, 'batch2.svg'))).toBe(true);
+
+      const content1 = fs.readFileSync(path.join(tmpDir, 'batch1.svg'), 'utf-8');
+      const content2 = fs.readFileSync(path.join(tmpDir, 'batch2.svg'), 'utf-8');
+      expect(content1).toContain('One');
+      expect(content2).toContain('Two');
+    });
+
+    test('converts to PNG with --format png', () => {
+      const file1 = path.join(tmpDir, 'formattest.kui');
+      fs.writeFileSync(file1, 'A1: { type: box }');
+
+      execSync(`npx tsx src/cli.ts ${file1} -f png`, {
+        encoding: 'utf-8',
+      });
+
+      const outputPath = path.join(tmpDir, 'formattest.png');
+      expect(fs.existsSync(outputPath)).toBe(true);
+
+      const buffer = fs.readFileSync(outputPath);
+      expect(buffer[0]).toBe(0x89); // PNG magic
+      expect(buffer[1]).toBe(0x50);
+    });
+
+    test('outputs to specified directory with -d', () => {
+      const outDir = path.join(tmpDir, 'output');
+      fs.mkdirSync(outDir, { recursive: true });
+
+      const file1 = path.join(tmpDir, 'dirtest.kui');
+      fs.writeFileSync(file1, 'A1: { type: txt, value: "DirTest" }');
+
+      execSync(`npx tsx src/cli.ts ${file1} -d ${outDir}`, {
+        encoding: 'utf-8',
+      });
+
+      const outputPath = path.join(outDir, 'dirtest.svg');
+      expect(fs.existsSync(outputPath)).toBe(true);
+
+      const content = fs.readFileSync(outputPath, 'utf-8');
+      expect(content).toContain('DirTest');
+    });
+
+    test('outputs PNG to specified directory with -d -f png', () => {
+      const outDir = path.join(tmpDir, 'output-png');
+      fs.mkdirSync(outDir, { recursive: true });
+
+      const file1 = path.join(tmpDir, 'dirpngtest.kui');
+      fs.writeFileSync(file1, 'A1: { type: box }');
+
+      execSync(`npx tsx src/cli.ts ${file1} -d ${outDir} -f png`, {
+        encoding: 'utf-8',
+      });
+
+      const outputPath = path.join(outDir, 'dirpngtest.png');
+      expect(fs.existsSync(outputPath)).toBe(true);
+
+      const buffer = fs.readFileSync(outputPath);
+      expect(buffer[0]).toBe(0x89);
+    });
+  });
+
+  describe('stdin support', () => {
+    test('reads from stdin when no file provided', () => {
+      const result = execSync(`printf 'ratio: 16:9\ngrid: 2x2\nA1: { type: txt, value: "FromStdin" }' | npx tsx src/cli.ts`, {
+        encoding: 'utf-8',
+        shell: '/bin/bash',
+      });
+
+      expect(result).toContain('<svg');
+      expect(result).toContain('FromStdin');
+    });
+
+    test('outputs to file when using stdin with -o', () => {
+      const outFile = path.join(tmpDir, 'stdin-output.svg');
+      execSync(`printf 'ratio: 16:9\ngrid: 2x2\nA1: { type: txt, value: "StdinFile" }' | npx tsx src/cli.ts -o ${outFile}`, {
+        encoding: 'utf-8',
+        shell: '/bin/bash',
+      });
+
+      const content = fs.readFileSync(outFile, 'utf-8');
+      expect(content).toContain('<svg');
+      expect(content).toContain('StdinFile');
+    });
+
+    test('outputs PNG when using stdin with -o .png', () => {
+      const outFile = path.join(tmpDir, 'stdin-output.png');
+      execSync(`printf 'ratio: 16:9\ngrid: 2x2\nA1: { type: box }' | npx tsx src/cli.ts -o ${outFile}`, {
+        encoding: 'utf-8',
+        shell: '/bin/bash',
+      });
+
+      const buffer = fs.readFileSync(outFile);
+      // PNG magic bytes
+      expect(buffer[0]).toBe(0x89);
+      expect(buffer[1]).toBe(0x50);
+    });
+  });
 });

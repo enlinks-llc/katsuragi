@@ -1,6 +1,7 @@
-import type { CellRange, CanvasSize, LayoutRect } from '../types.js';
+import type { CellRange, CanvasSize, LayoutRect, LayoutConfig } from '../types.js';
 
 const LONGEST_EDGE = 1280;
+const DEFAULT_PADDING = 16;
 
 export function calculateCanvasSize(ratio: [number, number]): CanvasSize {
   const [w, h] = ratio;
@@ -22,16 +23,34 @@ export function calculateCanvasSize(ratio: [number, number]): CanvasSize {
 export function calculateCellRect(
   range: CellRange,
   grid: [number, number],
-  canvas: CanvasSize
+  canvas: CanvasSize,
+  config: LayoutConfig = { gap: 0, padding: DEFAULT_PADDING },
+  cellPadding?: number
 ): LayoutRect {
   const [cols, rows] = grid;
-  const cellWidth = canvas.width / cols;
-  const cellHeight = canvas.height / rows;
+  const { gap } = config;
 
-  const x = range.start.col * cellWidth;
-  const y = range.start.row * cellHeight;
-  const width = (range.end.col - range.start.col + 1) * cellWidth;
-  const height = (range.end.row - range.start.row + 1) * cellHeight;
+  // Calculate effective cell size accounting for gaps
+  const totalGapX = gap * (cols - 1);
+  const totalGapY = gap * (rows - 1);
+  const cellWidth = (canvas.width - totalGapX) / cols;
+  const cellHeight = (canvas.height - totalGapY) / rows;
 
-  return { x, y, width, height };
+  // Calculate position including gaps
+  const x = range.start.col * (cellWidth + gap);
+  const y = range.start.row * (cellHeight + gap);
+
+  // Merged cell spans multiple gaps
+  const spanCols = range.end.col - range.start.col + 1;
+  const spanRows = range.end.row - range.start.row + 1;
+  const width = spanCols * cellWidth + (spanCols - 1) * gap;
+  const height = spanRows * cellHeight + (spanRows - 1) * gap;
+
+  return {
+    x,
+    y,
+    width,
+    height,
+    padding: cellPadding ?? config.padding,
+  };
 }

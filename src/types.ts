@@ -1,3 +1,9 @@
+export interface SourceLocation {
+  line: number; // 1-indexed
+  column: number; // 1-indexed
+  offset: number; // 0-indexed character position
+}
+
 export type ComponentType = 'txt' | 'box' | 'btn' | 'input' | 'img';
 export type Align = 'left' | 'center' | 'right';
 export type Style = 'default' | 'primary' | 'secondary';
@@ -19,6 +25,7 @@ export interface ComponentProps {
   style?: Style;
   src?: string;
   alt?: string;
+  padding?: number;
 }
 
 export interface Component {
@@ -30,6 +37,8 @@ export interface Component {
 export interface Metadata {
   ratio: [number, number];
   grid: [number, number]; // [cols, rows]
+  gap?: number;
+  padding?: number;
 }
 
 export interface KuiDocument {
@@ -42,9 +51,19 @@ export interface LayoutRect {
   y: number;
   width: number;
   height: number;
+  padding: number;
+}
+
+export interface LayoutConfig {
+  gap: number;
+  padding: number;
 }
 
 export interface CanvasSize {
   width: number;
   height: number;
+}
+
+export interface RenderContext {
+  basePath?: string;
 }
