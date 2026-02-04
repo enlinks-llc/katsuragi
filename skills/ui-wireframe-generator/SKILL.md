@@ -1,5 +1,5 @@
 ---
-name: katsuragi
+name: ui-wireframe-generator
 description: This skill generates text-based UI wireframes using .kui file syntax. Use when creating wireframes, mockups, or UI layout diagrams. The skill converts .kui files to SVG/PNG images via the katsuragi CLI tool.
 ---
 
@@ -8,6 +8,18 @@ description: This skill generates text-based UI wireframes using .kui file synta
 Generate text-based UI wireframes using `.kui` file syntax. Katsuragi converts simple declarative files into SVG/PNG images, serving as a communication medium for UI discussions.
 
 **GitHub**: https://github.com/enlinks-llc/katsuragi
+
+## Install
+
+```bash
+# Install this skill
+npx skills add enlinks-llc/katsuragi
+
+# Install katsuragi CLI
+npm install -g katsuragi
+# or use directly with npx
+npx ktr input.kui -o output.png
+```
 
 ## Why Katsuragi?
 
