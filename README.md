@@ -5,61 +5,44 @@
 [![npm version](https://badge.fury.io/js/katsuragi.svg)](https://www.npmjs.com/package/katsuragi)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
-**Wireframes that AI can read and write.**
+**Turn text into wireframes. Let AI do the drawing.**
 
-Describe your UI layout in a simple text format. Let ChatGPT, Claude, or any LLM generate, review, and iterate on wireframes with you.
+### Who is this for?
 
-![Login wireframe example](./docs/images/login.png)
+- Developers discussing UI with non-technical stakeholders
+- Full-stack engineers collaborating with AI on interface design
+- Anyone who wants to sketch UI without opening a design tool
+
+### How it works
+
+Write a `.kui` file:
+
+```kui
+ratio: 16:9
+grid: 2x2
+A1: { type: txt, value: "Login", align: center }
+A2..B2: { type: btn, value: "Submit" }
+```
+
+Run one command:
+
+```bash
+npx ktr login.kui -o login.png
+```
+
+Get this:
+
+![Login wireframe](./docs/images/login.png)
+
+---
+
+If this tool saves you time:
 
 [![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/enlinks)
 
-If this tool saves you time, grab us a coffee or [star this repo](https://github.com/enlinks-llc/katsuragi)!
+[Star this repo](https://github.com/enlinks-llc/katsuragi) to help others find it!
 
-## Why Text-Based?
-
-Katsuragi uses a text format because **AI can read and write it**.
-
-| Traditional Tools | Katsuragi |
-|-------------------|-----------|
-| Design in Figma, export, share screenshot | Describe in text, generate image |
-| AI can't edit your design file | AI can write and modify .kui files |
-| "Make the button bigger" requires manual work | AI understands and updates the code |
-
-### Why Plain Text Works with AI
-
-- **Easy to copy/paste** - No binary format, no special tools needed
-- **Fits in context windows** - .kui files are small, AI can hold entire layouts in memory
-- **Diff-friendly** - Changes are trackable in git, easy to review
-- **No vendor lock-in** - Works with any LLM (ChatGPT, Claude, Gemini, local models)
-
-### Workflow with AI
-
-1. **Add .kui spec to your project** (in `AGENTS.md`, system prompt, or project docs)
-2. Ask AI: "Create a login wireframe in .kui format"
-3. AI generates the .kui file
-4. Run `ktr login.kui -o login.png`
-5. Share the image, discuss, iterate
-6. AI updates the .kui based on feedback
-
-### Works with LLM-powered CLI Tools
-
-- **Claude Code** - Add spec to CLAUDE.md
-- **Cursor** - Add to project rules
-- **Aider** - Include in context
-- **Any LLM CLI** - Paste spec in system prompt or AGENTS.md
-
-### Example Prompt
-
-```
-Here's the .kui format specification:
-[paste the syntax section below]
-
-Create a mobile app wireframe for a task management app.
-Use 2x5 grid (ratio 9:16).
-Include: header with title, task list area, and floating action button.
-```
-
-Once the AI knows the format, it can generate and modify .kui code reliably.
+---
 
 ## Quick Start
 
@@ -119,6 +102,52 @@ cat input.kui | ktr -o output.png
 | `-f, --format <format>` | Output format: `svg` or `png` (default: `svg`) |
 | `-V, --version` | Show version number |
 | `-h, --help` | Show help |
+
+## Why Text-Based?
+
+Katsuragi uses a text format because **AI can read and write it**.
+
+| Traditional Tools | Katsuragi |
+|-------------------|-----------|
+| Design in Figma, export, share screenshot | Describe in text, generate image |
+| AI can't edit your design file | AI can write and modify .kui files |
+| "Make the button bigger" requires manual work | AI understands and updates the code |
+
+### Why Plain Text Works with AI
+
+- **Easy to copy/paste** - No binary format, no special tools needed
+- **Fits in context windows** - .kui files are small, AI can hold entire layouts in memory
+- **Diff-friendly** - Changes are trackable in git, easy to review
+- **No vendor lock-in** - Works with any LLM (ChatGPT, Claude, Gemini, local models)
+
+### Workflow with AI
+
+1. **Add .kui spec to your project** (in `AGENTS.md`, system prompt, or project docs)
+2. Ask AI: "Create a login wireframe in .kui format"
+3. AI generates the .kui file
+4. Run `ktr login.kui -o login.png`
+5. Share the image, discuss, iterate
+6. AI updates the .kui based on feedback
+
+### Works with LLM-powered CLI Tools
+
+- **Claude Code** - Add spec to CLAUDE.md
+- **Cursor** - Add to project rules
+- **Aider** - Include in context
+- **Any LLM CLI** - Paste spec in system prompt or AGENTS.md
+
+### Example Prompt
+
+```
+Here's the .kui format specification:
+[paste the syntax section below]
+
+Create a mobile app wireframe for a task management app.
+Use 2x5 grid (ratio 9:16).
+Include: header with title, task list area, and floating action button.
+```
+
+Once the AI knows the format, it can generate and modify .kui code reliably.
 
 ## .kui File Format
 
