@@ -11,7 +11,9 @@ Describe your UI layout in a simple text format. Let ChatGPT, Claude, or any LLM
 
 ![Login wireframe example](./docs/images/login.png)
 
-> Fueled by coffee and PRs. [Buy us one](https://buymeacoffee.com/enlinks) if this tool saves you time. And [star this repo](https://github.com/enlinks-llc/katsuragi)!
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/enlinks)
+
+If this tool saves you time, grab us a coffee or [star this repo](https://github.com/enlinks-llc/katsuragi)!
 
 ## Why Text-Based?
 

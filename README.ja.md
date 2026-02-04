@@ -11,7 +11,9 @@
 
 ![ログイン画面のワイヤーフレーム例](./docs/images/login.png)
 
-> コーヒーとPRで動いています。時間が節約できたら[一杯おごって](https://buymeacoffee.com/enlinks)ください。[Starも歓迎](https://github.com/enlinks-llc/katsuragi)！
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/enlinks)
+
+時間が節約できたらコーヒーをおごってください。[Starも歓迎](https://github.com/enlinks-llc/katsuragi)！
 
 ## なぜテキストベース？
 
