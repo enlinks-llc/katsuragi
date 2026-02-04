@@ -7,6 +7,24 @@ description: This skill generates text-based UI wireframes using .kui file synta
 
 Generate text-based UI wireframes using `.kui` file syntax. Katsuragi converts simple declarative files into SVG/PNG images, serving as a communication medium for UI discussions.
 
+**GitHub**: https://github.com/enlinks-llc/katsuragi
+
+## Why Katsuragi?
+
+- **LLM-friendly**: Text-based format that AI agents can read, write, and iterate on
+- **Human-readable**: Simple syntax anyone can understand without design tools
+- **Git-friendly**: Version control your wireframes alongside code
+- **Zero design skills needed**: Grid-based layout handles positioning automatically
+- **Instant output**: Generate PNG/SVG in seconds via CLI
+
+## Use Cases
+
+- **Developer ↔ Stakeholder communication**: Show rough UI ideas without Figma
+- **AI-assisted UI development**: Let LLMs propose layouts in `.kui` format
+- **Quick prototyping**: Sketch screen layouts before writing any frontend code
+- **Documentation**: Embed wireframes in technical specs and PRs
+- **Design discussions**: Iterate on layouts through text diffs
+
 ## When to Use
 
 - Creating quick UI wireframes or mockups
