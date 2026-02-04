@@ -126,7 +126,7 @@ A1: { type: txt, value: `
 ## ロードマップ
 
 - [x] MVP: 基本コンポーネント（txt, box, btn, input, img）
-- [ ] SVG/PNG出力
+- [x] SVG/PNG出力
 - [ ] Markdown埋め込み対応（` ```kui ` コードブロック）
 - [ ] HTML出力
 - [ ] VS Code拡張機能
