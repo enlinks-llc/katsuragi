@@ -36,7 +36,7 @@ describe('generateSvg', () => {
           {
             type: 'txt',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { value: 'Hello', align: 'left', style: 'default' },
+            props: { value: 'Hello', align: 'left' },
           },
         ],
       };
@@ -53,7 +53,7 @@ describe('generateSvg', () => {
           {
             type: 'txt',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { value: 'Center', align: 'center', style: 'default' },
+            props: { value: 'Center', align: 'center' },
           },
         ],
       };
@@ -69,7 +69,7 @@ describe('generateSvg', () => {
           {
             type: 'txt',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { value: 'Right', align: 'right', style: 'default' },
+            props: { value: 'Right', align: 'right' },
           },
         ],
       };
@@ -85,7 +85,7 @@ describe('generateSvg', () => {
           {
             type: 'txt',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { value: 'Line 1\nLine 2', align: 'left', style: 'default' },
+            props: { value: 'Line 1\nLine 2', align: 'left' },
           },
         ],
       };
@@ -103,7 +103,7 @@ describe('generateSvg', () => {
           {
             type: 'txt',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { value: 'Single line', align: 'left', style: 'default' },
+            props: { value: 'Single line', align: 'left' },
           },
         ],
       };
@@ -112,17 +112,51 @@ describe('generateSvg', () => {
       expect(svg).not.toContain('<tspan');
       expect(svg).toContain('>Single line</text>');
     });
+
+    test('renders txt with bg color', () => {
+      const doc: KuiDocument = {
+        metadata: { ratio: [16, 9], grid: [4, 3] },
+        components: [
+          {
+            type: 'txt',
+            range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
+            props: { value: 'With bg', align: 'left', bg: '#f0f0f0' },
+          },
+        ],
+      };
+      const svg = generateSvg(doc);
+
+      expect(svg).toContain('<rect');
+      expect(svg).toContain('fill="#f0f0f0"');
+      expect(svg).toContain('>With bg</text>');
+    });
+
+    test('renders txt with border color', () => {
+      const doc: KuiDocument = {
+        metadata: { ratio: [16, 9], grid: [4, 3] },
+        components: [
+          {
+            type: 'txt',
+            range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
+            props: { value: 'With border', align: 'left', border: '#ccc' },
+          },
+        ],
+      };
+      const svg = generateSvg(doc);
+
+      expect(svg).toContain('stroke="#ccc"');
+    });
   });
 
   describe('box component', () => {
-    test('renders box with default style (light gray)', () => {
+    test('renders box with default bg (light gray)', () => {
       const doc: KuiDocument = {
         metadata: { ratio: [16, 9], grid: [4, 3] },
         components: [
           {
             type: 'box',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { style: 'default' },
+            props: {},
           },
         ],
       };
@@ -132,37 +166,53 @@ describe('generateSvg', () => {
       expect(svg).toContain('fill="#e0e0e0"');
     });
 
-    test('renders box with primary style (black fill)', () => {
+    test('renders box with custom bg color', () => {
       const doc: KuiDocument = {
         metadata: { ratio: [16, 9], grid: [4, 3] },
         components: [
           {
             type: 'box',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { style: 'primary' },
+            props: { bg: '#3B82F6' },
           },
         ],
       };
       const svg = generateSvg(doc);
 
-      expect(svg).toContain('fill="black"');
+      expect(svg).toContain('fill="#3B82F6"');
     });
 
-    test('renders box with secondary style (stroke only)', () => {
+    test('renders box with border color', () => {
       const doc: KuiDocument = {
         metadata: { ratio: [16, 9], grid: [4, 3] },
         components: [
           {
             type: 'box',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { style: 'secondary' },
+            props: { border: '#333' },
           },
         ],
       };
       const svg = generateSvg(doc);
 
-      expect(svg).toContain('fill="white"');
-      expect(svg).toContain('stroke="black"');
+      expect(svg).toContain('stroke="#333"');
+    });
+
+    test('renders box with both bg and border', () => {
+      const doc: KuiDocument = {
+        metadata: { ratio: [16, 9], grid: [4, 3] },
+        components: [
+          {
+            type: 'box',
+            range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
+            props: { bg: '#f0f0f0', border: '#ccc' },
+          },
+        ],
+      };
+      const svg = generateSvg(doc);
+
+      expect(svg).toContain('fill="#f0f0f0"');
+      expect(svg).toContain('stroke="#ccc"');
     });
   });
 
@@ -174,7 +224,7 @@ describe('generateSvg', () => {
           {
             type: 'btn',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { value: 'Submit', style: 'primary' },
+            props: { value: 'Submit' },
           },
         ],
       };
@@ -184,22 +234,38 @@ describe('generateSvg', () => {
       expect(svg).toContain('>Submit</text>');
     });
 
-    test('renders btn with primary style (black bg, white text)', () => {
+    test('renders btn with default bg and black text', () => {
       const doc: KuiDocument = {
         metadata: { ratio: [16, 9], grid: [4, 3] },
         components: [
           {
             type: 'btn',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { value: 'Submit', style: 'primary' },
+            props: { value: 'Submit' },
           },
         ],
       };
       const svg = generateSvg(doc);
 
-      // Button should have black fill and white text
-      expect(svg).toContain('fill="black"');
-      expect(svg).toContain('fill="white"');
+      expect(svg).toContain('fill="#e0e0e0"');
+      expect(svg).toContain('fill="black"'); // text color is always black
+    });
+
+    test('renders btn with custom bg and border', () => {
+      const doc: KuiDocument = {
+        metadata: { ratio: [16, 9], grid: [4, 3] },
+        components: [
+          {
+            type: 'btn',
+            range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
+            props: { value: 'Submit', bg: '#3B82F6', border: '#333' },
+          },
+        ],
+      };
+      const svg = generateSvg(doc);
+
+      expect(svg).toContain('fill="#3B82F6"');
+      expect(svg).toContain('stroke="#333"');
     });
   });
 
@@ -211,7 +277,7 @@ describe('generateSvg', () => {
           {
             type: 'input',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { label: 'Email', style: 'default' },
+            props: { label: 'Email' },
           },
         ],
       };
@@ -219,6 +285,23 @@ describe('generateSvg', () => {
 
       expect(svg).toContain('>Email</text>');
       expect(svg).toContain('<rect');
+    });
+
+    test('renders input with custom bg and border', () => {
+      const doc: KuiDocument = {
+        metadata: { ratio: [16, 9], grid: [4, 3] },
+        components: [
+          {
+            type: 'input',
+            range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
+            props: { label: 'Email', bg: '#f0f0f0', border: '#3B82F6' },
+          },
+        ],
+      };
+      const svg = generateSvg(doc);
+
+      expect(svg).toContain('fill="#f0f0f0"');
+      expect(svg).toContain('stroke="#3B82F6"');
     });
   });
 
@@ -230,7 +313,7 @@ describe('generateSvg', () => {
           {
             type: 'img',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { src: '/logo.png', alt: 'Logo', style: 'default' },
+            props: { src: '/logo.png', alt: 'Logo' },
           },
         ],
       };
@@ -247,13 +330,30 @@ describe('generateSvg', () => {
           {
             type: 'img',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { src: '/logo.png', style: 'default' },
+            props: { src: '/logo.png' },
           },
         ],
       };
       const svg = generateSvg(doc);
 
       expect(svg).toContain('>[IMG: /logo.png]</text>');
+    });
+
+    test('renders img placeholder with custom bg and border', () => {
+      const doc: KuiDocument = {
+        metadata: { ratio: [16, 9], grid: [4, 3] },
+        components: [
+          {
+            type: 'img',
+            range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
+            props: { src: '/logo.png', alt: 'Logo', bg: '#eee', border: '#999' },
+          },
+        ],
+      };
+      const svg = generateSvg(doc);
+
+      expect(svg).toContain('fill="#eee"');
+      expect(svg).toContain('stroke="#999"');
     });
   });
 
@@ -265,7 +365,7 @@ describe('generateSvg', () => {
           {
             type: 'btn',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { value: 'Test', style: 'default' },
+            props: { value: 'Test' },
           },
         ],
       };
@@ -283,17 +383,17 @@ describe('generateSvg', () => {
           {
             type: 'txt',
             range: { start: { col: 0, row: 0 }, end: { col: 3, row: 0 } },
-            props: { value: 'Login', align: 'center', style: 'default' },
+            props: { value: 'Login', align: 'center' },
           },
           {
             type: 'input',
             range: { start: { col: 0, row: 1 }, end: { col: 3, row: 1 } },
-            props: { label: 'Email', style: 'default' },
+            props: { label: 'Email' },
           },
           {
             type: 'btn',
             range: { start: { col: 3, row: 2 }, end: { col: 3, row: 2 } },
-            props: { value: 'Submit', style: 'primary' },
+            props: { value: 'Submit', bg: '#3B82F6' },
           },
         ],
       };

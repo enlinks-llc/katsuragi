@@ -33,6 +33,7 @@ katsuragi input.kui -o output.png
 ```kui
 ratio: 16:9
 grid: 4x3
+colors: { primary: "#3B82F6" }
 
 // Header
 A1..D1: { type: txt, value: "Login", align: center }
@@ -40,7 +41,7 @@ A1..D1: { type: txt, value: "Login", align: center }
 // Form
 A2..D2: { type: input, label: "Email" }
 A3..C3: { type: input, label: "Password" }
-D3: { type: btn, value: "Submit", style: primary }
+D3: { type: btn, value: "Submit", bg: $primary }
 ```
 
 ### Grid System
@@ -63,16 +64,38 @@ A1: { type: txt, value: "Hello" }  // End-of-line comment
 
 | Type | Description | Properties | Defaults |
 |------|-------------|------------|----------|
-| `txt` | Text label | `value`, `align` | `align: left` |
-| `box` | Empty box/container | `style` | `style: default` |
-| `btn` | Button | `value`, `style` | `style: default` |
-| `input` | Input field | `label` | - |
-| `img` | Image placeholder | `src`, `alt` | - |
+| `txt` | Text label | `value`, `align`, `bg`, `border` | `align: left` |
+| `box` | Empty box/container | `bg`, `border` | `bg: #e0e0e0` |
+| `btn` | Button | `value`, `bg`, `border` | `bg: #e0e0e0` |
+| `input` | Input field | `label`, `bg`, `border` | `bg: white`, `border: black` |
+| `img` | Image placeholder | `src`, `alt`, `bg`, `border` | `bg: #f0f0f0`, `border: #ccc` |
 
-### Styles
+### Colors
+
+Define a color theme and use `$name` references:
+
+```kui
+colors: { primary: "#3B82F6", danger: "#EF4444", accent: "orange" }
+
+A1: { type: btn, value: "Submit", bg: $primary }
+A2: { type: btn, value: "Delete", bg: $danger, border: $accent }
+B1: { type: box, bg: "#f0f0f0", border: "#ccc" }
+B2: { type: box, bg: lightblue }
+```
+
+| Property | Description | Default |
+|----------|-------------|---------|
+| `bg` | Background color | Component-specific |
+| `border` | Border color (2px width) | none |
+
+Color formats:
+- HEX: `#RGB` or `#RRGGBB` (e.g., `#f00`, `#3B82F6`)
+- CSS color names: `red`, `blue`, `lightblue`, `orange`, etc.
+- Theme reference: `$name` (requires `colors:` definition)
+
+### Alignment
 
 - `align`: `left` (default), `center`, `right`
-- `style`: `default` (light gray), `primary` (black fill), `secondary` (stroke only)
 
 ### Multi-line Text
 

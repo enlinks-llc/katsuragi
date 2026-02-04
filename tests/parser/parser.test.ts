@@ -36,7 +36,7 @@ A1: { type: txt, value: "Hello" }`;
       expect(doc.components[0]).toEqual({
         type: 'txt',
         range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-        props: { value: 'Hello', align: 'left', style: 'default' },
+        props: { value: 'Hello', align: 'left' },
       });
     });
 
@@ -49,13 +49,13 @@ A1: { type: txt, value: "Hello" }`;
       });
     });
 
-    test('parses btn component with style', () => {
-      const input = `A1: { type: btn, value: "Submit", style: primary }`;
+    test('parses btn component with bg color', () => {
+      const input = `A1: { type: btn, value: "Submit", bg: "#3B82F6" }`;
       const doc = parse(input);
       expect(doc.components[0]).toEqual({
         type: 'btn',
         range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-        props: { value: 'Submit', align: 'left', style: 'primary' },
+        props: { value: 'Submit', align: 'left', bg: '#3B82F6' },
       });
     });
 
@@ -80,10 +80,11 @@ A1: { type: txt, value: "Hello" }`;
       expect(doc.components[0].props.align).toBe('left');
     });
 
-    test('applies default style: default', () => {
+    test('bg and border are undefined by default', () => {
       const input = `A1: { type: txt, value: "test" }`;
       const doc = parse(input);
-      expect(doc.components[0].props.style).toBe('default');
+      expect(doc.components[0].props.bg).toBeUndefined();
+      expect(doc.components[0].props.border).toBeUndefined();
     });
 
     test('respects explicit align value', () => {
@@ -104,7 +105,7 @@ A1: { type: txt, value: "Hello" }`;
       expect(doc.components[0]).toEqual({
         type: 'txt',
         range: { start: { col: 0, row: 0 }, end: { col: 1, row: 1 } },
-        props: { value: 'Long text here', align: 'center', style: 'default' },
+        props: { value: 'Long text here', align: 'center' },
       });
     });
   });
@@ -189,6 +190,72 @@ D3: { type: txt, value: "at edge" }`;
       const input = `grid: 2x2
 C1: { type: txt, value: "out of bounds" }`;
       expect(() => parse(input)).toThrow(/column.*bounds/i);
+    });
+  });
+
+  describe('colors metadata and properties', () => {
+    test('parses colors theme definition', () => {
+      const input = `colors: { primary: "#3B82F6", danger: "#EF4444" }
+A1: { type: btn, value: "Test" }`;
+      const doc = parse(input);
+      expect(doc.metadata.colors).toEqual({
+        primary: '#3B82F6',
+        danger: '#EF4444',
+      });
+    });
+
+    test('parses colors with CSS color names', () => {
+      const input = `colors: { accent: orange, light: lightblue }
+A1: { type: box }`;
+      const doc = parse(input);
+      expect(doc.metadata.colors).toEqual({
+        accent: 'orange',
+        light: 'lightblue',
+      });
+    });
+
+    test('resolves theme reference in bg property', () => {
+      const input = `colors: { primary: "#3B82F6" }
+A1: { type: btn, value: "Submit", bg: $primary }`;
+      const doc = parse(input);
+      expect(doc.components[0].props.bg).toBe('#3B82F6');
+    });
+
+    test('resolves theme reference in border property', () => {
+      const input = `colors: { accent: "#EF4444" }
+A1: { type: box, border: $accent }`;
+      const doc = parse(input);
+      expect(doc.components[0].props.border).toBe('#EF4444');
+    });
+
+    test('parses hex color directly in bg', () => {
+      const input = `A1: { type: box, bg: "#f0f0f0" }`;
+      const doc = parse(input);
+      expect(doc.components[0].props.bg).toBe('#f0f0f0');
+    });
+
+    test('parses CSS color name directly in bg', () => {
+      const input = `A1: { type: box, bg: lightblue }`;
+      const doc = parse(input);
+      expect(doc.components[0].props.bg).toBe('lightblue');
+    });
+
+    test('parses both bg and border', () => {
+      const input = `A1: { type: box, bg: "#f0f0f0", border: "#ccc" }`;
+      const doc = parse(input);
+      expect(doc.components[0].props.bg).toBe('#f0f0f0');
+      expect(doc.components[0].props.border).toBe('#ccc');
+    });
+
+    test('throws on undefined theme reference', () => {
+      const input = `A1: { type: btn, bg: $undefined }`;
+      expect(() => parse(input)).toThrow(/Undefined theme color.*\$undefined/);
+    });
+
+    test('colors metadata is optional', () => {
+      const input = `A1: { type: box }`;
+      const doc = parse(input);
+      expect(doc.metadata.colors).toBeUndefined();
     });
   });
 

@@ -1,4 +1,4 @@
-import type { Component, LayoutRect, Align, Style, RenderContext } from '../types.js';
+import type { Component, LayoutRect, Align, RenderContext } from '../types.js';
 import { resolveImagePath, loadImageAsDataUri } from '../utils/image.js';
 
 const STROKE_WIDTH = 2;
@@ -28,16 +28,7 @@ function getTextX(rect: LayoutRect, align: Align): number {
   }
 }
 
-function getStyleFill(style: Style): string {
-  switch (style) {
-    case 'primary':
-      return 'black';
-    case 'secondary':
-      return 'white';
-    default:
-      return '#e0e0e0';
-  }
-}
+const DEFAULT_BG = '#e0e0e0';
 
 function escapeXml(text: string): string {
   return text
@@ -81,26 +72,41 @@ function renderMultilineText(
 export function renderTxt(component: Component, rect: LayoutRect): string {
   const align = component.props.align ?? 'left';
   const value = component.props.value ?? '';
+  const bg = component.props.bg;
+  const border = component.props.border;
   const textX = getTextX(rect, align);
   const textY = rect.y + rect.height / 2 + FONT_SIZE / 3;
 
-  return renderMultilineText(value, textX, textY, FONT_SIZE, getTextAnchor(align), 'black');
+  const parts: string[] = [];
+
+  // Add background rect if bg or border is specified
+  if (bg || border) {
+    const strokeAttr = border ? `stroke="${border}" stroke-width="${STROKE_WIDTH}"` : '';
+    parts.push(`<rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${bg ?? 'transparent'}" ${strokeAttr}/>`);
+  }
+
+  parts.push(renderMultilineText(value, textX, textY, FONT_SIZE, getTextAnchor(align), 'black'));
+
+  if (parts.length === 1) {
+    return parts[0];
+  }
+  return `<g>\n  ${parts.join('\n  ')}\n</g>`;
 }
 
 export function renderBox(component: Component, rect: LayoutRect): string {
-  const style = component.props.style ?? 'default';
-  const fill = getStyleFill(style);
-  const stroke = style === 'secondary' ? `stroke="black" stroke-width="${STROKE_WIDTH}"` : '';
+  const fill = component.props.bg ?? DEFAULT_BG;
+  const border = component.props.border;
+  const strokeAttr = border ? `stroke="${border}" stroke-width="${STROKE_WIDTH}"` : '';
 
-  return `<rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${fill}" ${stroke}/>`;
+  return `<rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${fill}" ${strokeAttr}/>`;
 }
 
 export function renderBtn(component: Component, rect: LayoutRect): string {
-  const style = component.props.style ?? 'default';
   const value = component.props.value ?? '';
-  const fill = getStyleFill(style);
-  const textColor = style === 'primary' ? 'white' : 'black';
-  const stroke = style === 'secondary' ? `stroke="black" stroke-width="${STROKE_WIDTH}"` : '';
+  const fill = component.props.bg ?? DEFAULT_BG;
+  const border = component.props.border;
+  const strokeAttr = border ? `stroke="${border}" stroke-width="${STROKE_WIDTH}"` : '';
+  const textColor = 'black'; // Text color is always black
 
   const textX = rect.x + rect.width / 2;
   const textY = rect.y + rect.height / 2 + FONT_SIZE / 3;
@@ -108,13 +114,15 @@ export function renderBtn(component: Component, rect: LayoutRect): string {
   const textElement = renderMultilineText(value, textX, textY, FONT_SIZE, 'middle', textColor);
 
   return `<g>
-  <rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${fill}" ${stroke}/>
+  <rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${fill}" ${strokeAttr}/>
   ${textElement}
 </g>`;
 }
 
 export function renderInput(component: Component, rect: LayoutRect): string {
   const label = component.props.label ?? '';
+  const fill = component.props.bg ?? 'white';
+  const border = component.props.border ?? 'black';
   const padding = rect.padding;
   const labelY = rect.y + padding + FONT_SIZE / 2;
   const inputY = rect.y + padding + FONT_SIZE + 8;
@@ -122,16 +130,18 @@ export function renderInput(component: Component, rect: LayoutRect): string {
 
   return `<g>
   <text x="${rect.x + padding}" y="${labelY}" font-size="${FONT_SIZE * 0.75}" fill="black">${escapeXml(label)}</text>
-  <rect x="${rect.x + padding}" y="${inputY}" width="${rect.width - padding * 2}" height="${Math.max(inputHeight, 40)}" rx="${BORDER_RADIUS / 2}" fill="white" stroke="black" stroke-width="${STROKE_WIDTH}"/>
+  <rect x="${rect.x + padding}" y="${inputY}" width="${rect.width - padding * 2}" height="${Math.max(inputHeight, 40)}" rx="${BORDER_RADIUS / 2}" fill="${fill}" stroke="${border}" stroke-width="${STROKE_WIDTH}"/>
 </g>`;
 }
 
-function renderImgPlaceholder(rect: LayoutRect, alt: string): string {
+function renderImgPlaceholder(rect: LayoutRect, alt: string, bg?: string, border?: string): string {
   const textX = rect.x + rect.width / 2;
   const textY = rect.y + rect.height / 2 + FONT_SIZE / 3;
+  const fill = bg ?? '#f0f0f0';
+  const stroke = border ?? '#ccc';
 
   return `<g>
-  <rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="#f0f0f0" stroke="#ccc" stroke-width="${STROKE_WIDTH}"/>
+  <rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${fill}" stroke="${stroke}" stroke-width="${STROKE_WIDTH}"/>
   <text x="${textX}" y="${textY}" font-size="${FONT_SIZE}" text-anchor="middle" fill="#666">[IMG: ${escapeXml(alt)}]</text>
 </g>`;
 }
@@ -141,12 +151,12 @@ export function renderImg(
   rect: LayoutRect,
   context?: RenderContext
 ): string {
-  const { src, alt } = component.props;
+  const { src, alt, bg, border } = component.props;
   const altText = alt ?? src ?? 'image';
 
   // If no src or context, render placeholder
   if (!src || !context?.basePath) {
-    return renderImgPlaceholder(rect, altText);
+    return renderImgPlaceholder(rect, altText, bg, border);
   }
 
   try {
@@ -156,6 +166,6 @@ export function renderImg(
     return `<image x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" href="${dataUri}" preserveAspectRatio="xMidYMid meet"/>`;
   } catch {
     // Fallback to placeholder on error
-    return renderImgPlaceholder(rect, altText);
+    return renderImgPlaceholder(rect, altText, bg, border);
   }
 }

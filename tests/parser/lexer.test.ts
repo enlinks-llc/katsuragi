@@ -219,6 +219,56 @@ describe('tokenize', () => {
     });
   });
 
+  describe('color tokens', () => {
+    test('tokenizes hex color (#RGB)', () => {
+      const tokens = tokenize('{ bg: #f00 }');
+      expect(tokensWithoutLoc(tokens)).toEqual([
+        { type: TokenType.LBRACE, value: '{' },
+        { type: TokenType.IDENTIFIER, value: 'bg' },
+        { type: TokenType.COLON, value: ':' },
+        { type: TokenType.HEX_COLOR, value: '#f00' },
+        { type: TokenType.RBRACE, value: '}' },
+        { type: TokenType.EOF, value: '' },
+      ]);
+    });
+
+    test('tokenizes hex color (#RRGGBB)', () => {
+      const tokens = tokenize('{ bg: #3B82F6 }');
+      expect(tokensWithoutLoc(tokens)).toEqual([
+        { type: TokenType.LBRACE, value: '{' },
+        { type: TokenType.IDENTIFIER, value: 'bg' },
+        { type: TokenType.COLON, value: ':' },
+        { type: TokenType.HEX_COLOR, value: '#3B82F6' },
+        { type: TokenType.RBRACE, value: '}' },
+        { type: TokenType.EOF, value: '' },
+      ]);
+    });
+
+    test('tokenizes theme reference', () => {
+      const tokens = tokenize('{ bg: $primary }');
+      expect(tokensWithoutLoc(tokens)).toEqual([
+        { type: TokenType.LBRACE, value: '{' },
+        { type: TokenType.IDENTIFIER, value: 'bg' },
+        { type: TokenType.COLON, value: ':' },
+        { type: TokenType.THEME_REF, value: '$primary' },
+        { type: TokenType.RBRACE, value: '}' },
+        { type: TokenType.EOF, value: '' },
+      ]);
+    });
+
+    test('throws on invalid hex color', () => {
+      expect(() => tokenize('{ bg: #f0 }')).toThrow(/Invalid hex color/);
+    });
+
+    test('throws on invalid hex color (5 digits)', () => {
+      expect(() => tokenize('{ bg: #12345 }')).toThrow(/Invalid hex color/);
+    });
+
+    test('throws on empty theme reference', () => {
+      expect(() => tokenize('{ bg: $ }')).toThrow(/Invalid theme reference/);
+    });
+  });
+
   describe('error handling', () => {
     test('throws on unterminated string', () => {
       expect(() => tokenize('{ value: "unterminated }')).toThrow(

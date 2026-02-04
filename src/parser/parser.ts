@@ -6,7 +6,7 @@ import type {
   ComponentProps,
   CellRange,
   Align,
-  Style,
+  ColorTheme,
   SourceLocation,
 } from '../types.js';
 import { TokenType, tokenize, type Token } from './lexer.js';
@@ -22,7 +22,6 @@ const VALID_COMPONENT_TYPES = new Set<ComponentType>([
 ]);
 
 const VALID_ALIGNS = new Set<Align>(['left', 'center', 'right']);
-const VALID_STYLES = new Set<Style>(['default', 'primary', 'secondary']);
 
 function rangesOverlap(a: CellRange, b: CellRange): boolean {
   // Check if ranges don't overlap (any edge outside)
@@ -133,6 +132,10 @@ export function parse(input: string): KuiDocument {
         value = advance().value;
       } else if (nextToken.type === TokenType.NUMBER) {
         value = advance().value;
+      } else if (nextToken.type === TokenType.HEX_COLOR) {
+        value = advance().value;
+      } else if (nextToken.type === TokenType.THEME_REF) {
+        value = advance().value;
       } else {
         throw syntaxError(`Unexpected token ${nextToken.type} for property value`, nextToken.loc);
       }
@@ -151,11 +154,65 @@ export function parse(input: string): KuiDocument {
     return props;
   }
 
+  function parseColors(): ColorTheme {
+    expect(TokenType.LBRACE);
+    skipNewlines();
+
+    const colors: ColorTheme = {};
+
+    while (peek().type !== TokenType.RBRACE) {
+      skipNewlines();
+
+      if (peek().type === TokenType.RBRACE) break;
+
+      const key = expect(TokenType.IDENTIFIER).value;
+      expect(TokenType.COLON);
+
+      const valueToken = peek();
+      let value: string;
+      if (valueToken.type === TokenType.HEX_COLOR) {
+        value = advance().value;
+      } else if (valueToken.type === TokenType.STRING) {
+        value = advance().value;
+      } else if (valueToken.type === TokenType.IDENTIFIER) {
+        // CSS color names like "orange", "lightblue"
+        value = advance().value;
+      } else {
+        throw syntaxError(`Expected color value, got ${valueToken.type}`, valueToken.loc);
+      }
+
+      colors[key] = value;
+
+      skipNewlines();
+
+      if (peek().type === TokenType.COMMA) {
+        advance();
+        skipNewlines();
+      }
+    }
+
+    expect(TokenType.RBRACE);
+    return colors;
+  }
+
+  function resolveColor(
+    value: string | undefined,
+    colors: ColorTheme | undefined,
+    loc: SourceLocation
+  ): string | undefined {
+    if (!value) return undefined;
+    if (value.startsWith('$')) {
+      const name = value.slice(1);
+      if (!colors?.[name]) {
+        throw syntaxError(`Undefined theme color: ${value}`, loc);
+      }
+      return colors[name];
+    }
+    return value;
+  }
+
   function parseComponent(cellToken: Token): Component {
-    const rangeStr =
-      cellToken.type === TokenType.CELL_REF
-        ? cellToken.value
-        : cellToken.value;
+    const rangeStr = cellToken.value;
     const range = parseCellRange(rangeStr);
 
     expect(TokenType.COLON);
@@ -174,14 +231,10 @@ export function parse(input: string): KuiDocument {
 
     // Apply defaults
     const align = (rawProps.align as Align) || 'left';
-    const style = (rawProps.style as Style) || 'default';
 
-    // Validate align and style
+    // Validate align
     if (!VALID_ALIGNS.has(align)) {
       throw syntaxError(`Invalid align value: ${align}`, cellToken.loc);
-    }
-    if (!VALID_STYLES.has(style)) {
-      throw syntaxError(`Invalid style value: ${style}`, cellToken.loc);
     }
 
     // Check for overlap with existing components
@@ -194,12 +247,17 @@ export function parse(input: string): KuiDocument {
       }
     }
 
+    // Resolve color references
+    const bg = resolveColor(rawProps.bg, metadata.colors, cellToken.loc);
+    const border = resolveColor(rawProps.border, metadata.colors, cellToken.loc);
+
     // Build props without 'type'
     const props: ComponentProps = {
       value: rawProps.value,
       label: rawProps.label,
       align,
-      style,
+      bg,
+      border,
       src: rawProps.src,
       alt: rawProps.alt,
       padding: rawProps.padding ? parseInt(rawProps.padding, 10) : undefined,
@@ -237,6 +295,8 @@ export function parse(input: string): KuiDocument {
       } else if (name === 'padding') {
         const numToken = expect(TokenType.NUMBER);
         metadata.padding = parseInt(numToken.value, 10);
+      } else if (name === 'colors') {
+        metadata.colors = parseColors();
       } else {
         throw syntaxError(`Unknown metadata: ${name}`, identToken.loc);
       }

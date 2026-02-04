@@ -1,5 +1,6 @@
 ratio: 9:16
 grid: 3x5
+colors: { primary: "#3B82F6", outline: "#333" }
 
 // Header
 A1..C1: { type: txt, value: "My App", align: center }
@@ -11,5 +12,5 @@ A2..C2: { type: img, alt: "Profile Photo" }
 A3..C3: { type: txt, value: "John Doe", align: center }
 
 // Actions
-A4..C4: { type: btn, value: "Edit Profile", style: primary }
-A5..C5: { type: btn, value: "Settings", style: secondary }
+A4..C4: { type: btn, value: "Edit Profile", bg: $primary }
+A5..C5: { type: btn, value: "Settings", border: $outline }

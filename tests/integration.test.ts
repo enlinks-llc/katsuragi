@@ -51,15 +51,16 @@ describe('Integration: End-to-end', () => {
     const kuiContent = `
 ratio: 16:9
 grid: 4x3
+colors: { primary: "#3B82F6", outline: "#333" }
 
 // Header
 A1..D1: { type: txt, value: "Integration Test", align: center }
 
 // Content
-A2..B3: { type: box, style: default }
+A2..B3: { type: box }
 C2..D2: { type: input, label: "Name" }
-C3: { type: btn, value: "Cancel", style: secondary }
-D3: { type: btn, value: "OK", style: primary }
+C3: { type: btn, value: "Cancel", border: $outline }
+D3: { type: btn, value: "OK", bg: $primary }
 `;
 
     // Parse
@@ -107,23 +108,24 @@ E1: { type: img, alt: "Image" }
     expect(svg).toContain('[IMG: Image]');
   });
 
-  test('handles all style variants', () => {
+  test('handles color variants', () => {
     const kuiContent = `
 ratio: 4:3
 grid: 3x1
+colors: { primary: "#3B82F6", danger: "#EF4444" }
 
-A1: { type: btn, value: "Default", style: default }
-B1: { type: btn, value: "Primary", style: primary }
-C1: { type: btn, value: "Secondary", style: secondary }
+A1: { type: btn, value: "Default" }
+B1: { type: btn, value: "Primary", bg: $primary }
+C1: { type: btn, value: "Danger", bg: $danger, border: black }
 `;
 
     const doc = parse(kuiContent);
     const svg = generateSvg(doc);
 
-    expect(svg).toContain('fill="#e0e0e0"'); // default
-    expect(svg).toContain('fill="black"'); // primary
-    expect(svg).toContain('fill="white"'); // secondary (with stroke)
-    expect(svg).toContain('stroke="black"'); // secondary stroke
+    expect(svg).toContain('fill="#e0e0e0"'); // default bg
+    expect(svg).toContain('fill="#3B82F6"'); // primary bg
+    expect(svg).toContain('fill="#EF4444"'); // danger bg
+    expect(svg).toContain('stroke="black"'); // border
   });
 
   test('handles all align variants', () => {

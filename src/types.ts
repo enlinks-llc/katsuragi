@@ -6,7 +6,10 @@ export interface SourceLocation {
 
 export type ComponentType = 'txt' | 'box' | 'btn' | 'input' | 'img';
 export type Align = 'left' | 'center' | 'right';
-export type Style = 'default' | 'primary' | 'secondary';
+
+export interface ColorTheme {
+  [name: string]: string;
+}
 
 export interface CellCoord {
   col: number; // 0-indexed (A=0, B=1, ...)
@@ -22,7 +25,8 @@ export interface ComponentProps {
   value?: string;
   label?: string;
   align?: Align;
-  style?: Style;
+  bg?: string;
+  border?: string;
   src?: string;
   alt?: string;
   padding?: number;
@@ -39,6 +43,7 @@ export interface Metadata {
   grid: [number, number]; // [cols, rows]
   gap?: number;
   padding?: number;
+  colors?: ColorTheme;
 }
 
 export interface KuiDocument {

@@ -14,6 +14,8 @@ export const TokenType = {
   GRID: 'GRID',
   NEWLINE: 'NEWLINE',
   EOF: 'EOF',
+  HEX_COLOR: 'HEX_COLOR',
+  THEME_REF: 'THEME_REF',
 } as const;
 
 export type TokenType = (typeof TokenType)[keyof typeof TokenType];
@@ -212,6 +214,35 @@ export function tokenize(input: string): Token[] {
     if (ch === '`') {
       const value = readBacktickString(loc);
       tokens.push({ type: TokenType.STRING, value, loc });
+      continue;
+    }
+
+    // Hex color (#RGB or #RRGGBB)
+    if (ch === '#') {
+      let value = '#';
+      advance(); // consume #
+      while (pos < input.length && /[0-9A-Fa-f]/.test(peek())) {
+        value += advance();
+      }
+      const hex = value.slice(1);
+      if (!/^[0-9A-Fa-f]{3}$/.test(hex) && !/^[0-9A-Fa-f]{6}$/.test(hex)) {
+        throw new Error(`Invalid hex color: ${value} at ${loc.line}:${loc.column}`);
+      }
+      tokens.push({ type: TokenType.HEX_COLOR, value, loc });
+      continue;
+    }
+
+    // Theme reference ($name)
+    if (ch === '$') {
+      let value = '$';
+      advance(); // consume $
+      while (pos < input.length && /[a-zA-Z0-9_]/.test(peek())) {
+        value += advance();
+      }
+      if (value.length === 1) {
+        throw new Error(`Invalid theme reference at ${loc.line}:${loc.column}`);
+      }
+      tokens.push({ type: TokenType.THEME_REF, value, loc });
       continue;
     }
 

@@ -31,6 +31,7 @@ katsuragi input.kui -o output.png
 ```kui
 ratio: 16:9
 grid: 4x3
+colors: { primary: "#3B82F6" }
 
 // ヘッダー
 A1..D1: { type: txt, value: "ログイン", align: center }
@@ -38,7 +39,7 @@ A1..D1: { type: txt, value: "ログイン", align: center }
 // フォーム
 A2..D2: { type: input, label: "メールアドレス" }
 A3..C3: { type: input, label: "パスワード" }
-D3: { type: btn, value: "送信", style: primary }
+D3: { type: btn, value: "送信", bg: $primary }
 ```
 
 ### グリッドシステム
@@ -61,16 +62,38 @@ A1: { type: txt, value: "Hello" }  // 行末コメント
 
 | タイプ | 説明 | プロパティ | デフォルト |
 |--------|------|------------|------------|
-| `txt` | テキストラベル | `value`, `align` | `align: left` |
-| `box` | 空のボックス/コンテナ | `style` | `style: default` |
-| `btn` | ボタン | `value`, `style` | `style: default` |
-| `input` | 入力フィールド | `label` | - |
-| `img` | 画像プレースホルダー | `src`, `alt` | - |
+| `txt` | テキストラベル | `value`, `align`, `bg`, `border` | `align: left` |
+| `box` | 空のボックス/コンテナ | `bg`, `border` | `bg: #e0e0e0` |
+| `btn` | ボタン | `value`, `bg`, `border` | `bg: #e0e0e0` |
+| `input` | 入力フィールド | `label`, `bg`, `border` | `bg: white`, `border: black` |
+| `img` | 画像プレースホルダー | `src`, `alt`, `bg`, `border` | `bg: #f0f0f0`, `border: #ccc` |
 
-### スタイル
+### カラー
+
+カラーテーマを定義し、`$name` で参照できます：
+
+```kui
+colors: { primary: "#3B82F6", danger: "#EF4444", accent: "orange" }
+
+A1: { type: btn, value: "送信", bg: $primary }
+A2: { type: btn, value: "削除", bg: $danger, border: $accent }
+B1: { type: box, bg: "#f0f0f0", border: "#ccc" }
+B2: { type: box, bg: lightblue }
+```
+
+| プロパティ | 説明 | デフォルト |
+|------------|------|------------|
+| `bg` | 背景色 | コンポーネントごとに異なる |
+| `border` | ボーダー色（幅2px固定） | なし |
+
+対応する色形式：
+- HEX: `#RGB` または `#RRGGBB`（例: `#f00`, `#3B82F6`）
+- CSS色名: `red`, `blue`, `lightblue`, `orange` など
+- テーマ参照: `$name`（`colors:` での定義が必要）
+
+### 配置
 
 - `align`: `left`（デフォルト）, `center`, `right`
-- `style`: `default`（薄グレー）, `primary`（黒塗り）, `secondary`（枠線のみ）
 
 ### 複数行テキスト
 
