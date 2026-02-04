@@ -274,3 +274,7 @@ Katsuragi is built on the shoulders of giants:
 ---
 
 If you find Katsuragi useful, please star this repo!
+
+---
+
+Copyright © 2025 [En-Links LLC](https://github.com/enlinks-llc)

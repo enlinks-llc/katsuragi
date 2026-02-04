@@ -274,3 +274,7 @@ Katsuragiは多くの素晴らしいオープンソースプロジェクトの�
 ---
 
 Katsuragiが気に入ったら、ぜひStarをお願いします！
+
+---
+
+Copyright © 2025 [合同会社エン・リンクス (En-Links LLC)](https://github.com/enlinks-llc)
