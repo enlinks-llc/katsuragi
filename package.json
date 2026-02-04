@@ -28,7 +28,7 @@
     "design"
   ],
   "author": "",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "dependencies": {
     "commander": "^14.0.3",
     "sharp": "^0.34.5"

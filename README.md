@@ -113,4 +113,7 @@ The longest edge is fixed at 1280px. The shorter edge is calculated from the rat
 
 ## License
 
-MIT
+- **Open Source**: AGPL-3.0 (free if you open-source your code)
+- **Commercial**: License required for SaaS integration or closed-source use
+
+For commercial licensing, contact [En-Links LLC](https://github.com/enlinks-llc).
