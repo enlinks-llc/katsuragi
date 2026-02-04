@@ -51,6 +51,7 @@ docs/
 .claude/
 .claude.json
 .claude-*
+CLAUDE.md
 
 # Cursor
 .cursor/
@@ -90,7 +91,38 @@ docs/
 # JetBrains AI
 .junie/
 
+# Cline
+.cline/
+.clineignore
+.clinerules
+
+# Zed
+.zed/
+
+# Supermaven
+.supermaven/
+
+# Pieces
+.pieces/
+
+# OpenAI
+.openai/
+
 # Other AI tools
 .ai/
 .llm/
 .gpt/
+
+# ===================
+# Local Overrides
+# ===================
+*.local.md
+*.local.json
+
+# ===================
+# Security
+# ===================
+.secrets/
+secrets/
+*.pem
+*.key
