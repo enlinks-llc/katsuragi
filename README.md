@@ -249,7 +249,10 @@ The longest edge is fixed at 1280px. The shorter edge is calculated from the rat
 ## License
 
 - **Open Source**: AGPL-3.0 (free if you open-source your code)
-- **Commercial**: License required for SaaS integration or closed-source use
+- **Commercial Products**: Free to use for building commercial products
+- **Commercial License Required**: Only when embedding Katsuragi into SaaS platforms or distributing as closed-source
+
+> **Example**: Using Katsuragi to create wireframes for your commercial app? Totally free. Integrating Katsuragi into your design tool SaaS? Commercial license required.
 
 For commercial licensing, contact [En-Links LLC](https://github.com/enlinks-llc).
 
