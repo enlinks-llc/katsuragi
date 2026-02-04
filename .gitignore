@@ -39,6 +39,9 @@ tmp/
 temp/
 *.tmp
 
+# Sandbox (for testing)
+sandbox/
+
 # Local documentation (except plans)
 docs/
 !docs/plans/
