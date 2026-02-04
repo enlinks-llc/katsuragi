@@ -1,5 +1,7 @@
 ratio: 16:9
 grid: 4x3
+gap: 8
+padding: 16
 colors: { primary: "#3B82F6" }
 
 // Header

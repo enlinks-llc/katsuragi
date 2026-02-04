@@ -111,6 +111,24 @@ D3: { type: btn, value: "送信", bg: $primary }
 - セル参照はExcel形式: `A1`, `B2`, `C3`
 - 範囲指定: `A1..B3`（左上から右下）
 
+### 間隔とパディング
+
+```kui
+ratio: 16:9
+grid: 3x2
+gap: 8
+padding: 24
+
+A1: { type: box }
+B1: { type: box }
+C1: { type: box }
+A2..C2: { type: txt, value: "コンテンツエリア", padding: 16 }
+```
+
+- `gap` - セル間の間隔（ピクセル単位、デフォルト: `0`）
+- `padding` - キャンバスの余白（ピクセル単位、デフォルト: `0`）
+- セル単位の `padding` - 個別セルのコンテンツパディングを上書き
+
 ### コメント
 
 `//` でコメントを記述できます：
@@ -124,11 +142,11 @@ A1: { type: txt, value: "Hello" }  // 行末コメント
 
 | タイプ | 説明 | プロパティ | デフォルト |
 |--------|------|------------|------------|
-| `txt` | テキストラベル | `value`, `align`, `bg`, `border` | `align: left` |
-| `box` | 空のボックス/コンテナ | `bg`, `border` | `bg: #e0e0e0` |
-| `btn` | ボタン | `value`, `bg`, `border` | `bg: #e0e0e0` |
-| `input` | 入力フィールド | `label`, `bg`, `border` | `bg: white`, `border: black` |
-| `img` | 画像プレースホルダー | `src`, `alt`, `bg`, `border` | `bg: #f0f0f0`, `border: #ccc` |
+| `txt` | テキストラベル | `value`, `align`, `bg`, `border`, `padding` | `align: left` |
+| `box` | 空のボックス/コンテナ | `bg`, `border`, `padding` | `bg: #e0e0e0` |
+| `btn` | ボタン | `value`, `bg`, `border`, `padding` | `bg: #e0e0e0` |
+| `input` | 入力フィールド | `label`, `bg`, `border`, `padding` | `bg: white`, `border: black` |
+| `img` | 画像プレースホルダー | `src`, `alt`, `bg`, `border`, `padding` | `bg: #f0f0f0`, `border: #ccc` |
 
 ### カラー
 

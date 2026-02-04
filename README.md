@@ -113,6 +113,24 @@ D3: { type: btn, value: "Submit", bg: $primary }
 - Cell references use Excel-style notation: `A1`, `B2`, `C3`
 - Range notation: `A1..B3` (top-left to bottom-right)
 
+### Gap & Padding
+
+```kui
+ratio: 16:9
+grid: 3x2
+gap: 8
+padding: 24
+
+A1: { type: box }
+B1: { type: box }
+C1: { type: box }
+A2..C2: { type: txt, value: "Content area", padding: 16 }
+```
+
+- `gap` - Spacing between cells (in pixels, default: `0`)
+- `padding` - Canvas margin (in pixels, default: `0`)
+- Per-cell `padding` - Override content padding for individual cells
+
 ### Comments
 
 Use `//` for comments:
@@ -126,11 +144,11 @@ A1: { type: txt, value: "Hello" }  // End-of-line comment
 
 | Type | Description | Properties | Defaults |
 |------|-------------|------------|----------|
-| `txt` | Text label | `value`, `align`, `bg`, `border` | `align: left` |
-| `box` | Empty box/container | `bg`, `border` | `bg: #e0e0e0` |
-| `btn` | Button | `value`, `bg`, `border` | `bg: #e0e0e0` |
-| `input` | Input field | `label`, `bg`, `border` | `bg: white`, `border: black` |
-| `img` | Image placeholder | `src`, `alt`, `bg`, `border` | `bg: #f0f0f0`, `border: #ccc` |
+| `txt` | Text label | `value`, `align`, `bg`, `border`, `padding` | `align: left` |
+| `box` | Empty box/container | `bg`, `border`, `padding` | `bg: #e0e0e0` |
+| `btn` | Button | `value`, `bg`, `border`, `padding` | `bg: #e0e0e0` |
+| `input` | Input field | `label`, `bg`, `border`, `padding` | `bg: white`, `border: black` |
+| `img` | Image placeholder | `src`, `alt`, `bg`, `border`, `padding` | `bg: #f0f0f0`, `border: #ccc` |
 
 ### Colors
 
