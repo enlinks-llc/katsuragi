@@ -253,6 +253,24 @@ A1: { type: txt, value: `
 
 商用ライセンスについては [En-Links LLC](https://github.com/enlinks-llc) までお問い合わせください。
 
+## サードパーティライセンス
+
+本ソフトウェアは以下のオープンソースライブラリを使用しています：
+
+| ライブラリ | ライセンス | 説明 |
+|-----------|-----------|------|
+| [sharp](https://sharp.pixelplumbing.com/) | Apache-2.0 | 高性能画像処理 |
+| [libvips](https://github.com/libvips/libvips) | LGPL-3.0-or-later | 画像処理ライブラリ（sharpの依存） |
+| [commander](https://github.com/tj/commander.js) | MIT | CLIパーサー |
+
+## 謝辞
+
+Katsuragiは多くの素晴らしいオープンソースプロジェクトの上に成り立っています：
+
+- **[libvips](https://github.com/libvips/libvips)** (John Googley-Fletcherほかコントリビューター) - PNG生成を支える高速画像処理エンジン
+- **[sharp](https://github.com/lovell/sharp)** (Lovell Fuller) - libvipsを使いやすいNode.js APIで提供
+- **[commander.js](https://github.com/tj/commander.js)** (TJ Holowaychuk) - Node.js CLIツールのスタンダード
+
 ---
 
 Katsuragiが気に入ったら、ぜひStarをお願いします！

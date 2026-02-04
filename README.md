@@ -253,6 +253,24 @@ The longest edge is fixed at 1280px. The shorter edge is calculated from the rat
 
 For commercial licensing, contact [En-Links LLC](https://github.com/enlinks-llc).
 
+## Third-Party Licenses
+
+This software uses the following open-source libraries:
+
+| Library | License | Description |
+|---------|---------|-------------|
+| [sharp](https://sharp.pixelplumbing.com/) | Apache-2.0 | High-performance image processing |
+| [libvips](https://github.com/libvips/libvips) | LGPL-3.0-or-later | Image processing library (sharp dependency) |
+| [commander](https://github.com/tj/commander.js) | MIT | CLI argument parsing |
+
+## Acknowledgments
+
+Katsuragi is built on the shoulders of giants:
+
+- **[libvips](https://github.com/libvips/libvips)** by John Googley-Fletcher and contributors - The fast image processing engine that powers our PNG generation
+- **[sharp](https://github.com/lovell/sharp)** by Lovell Fuller - Making libvips accessible from Node.js with an elegant API
+- **[commander.js](https://github.com/tj/commander.js)** by TJ Holowaychuk - The standard for building Node.js CLI tools
+
 ---
 
 If you find Katsuragi useful, please star this repo!
