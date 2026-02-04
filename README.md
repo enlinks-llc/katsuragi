@@ -11,6 +11,8 @@ Describe your UI layout in a simple text format. Let ChatGPT, Claude, or any LLM
 
 ![Login wireframe example](./docs/images/login.png)
 
+> Fueled by coffee and PRs. [Buy us one](https://buymeacoffee.com/enlinks) if this tool saves you time. And [star this repo](https://github.com/enlinks-llc/katsuragi)!
+
 ## Why Text-Based?
 
 Katsuragi uses a text format because **AI can read and write it**.
@@ -273,15 +275,6 @@ Katsuragi is built on the shoulders of giants:
 - **[libvips](https://github.com/libvips/libvips)** by John Googley-Fletcher and contributors - The fast image processing engine that powers our PNG generation
 - **[sharp](https://github.com/lovell/sharp)** by Lovell Fuller - Making libvips accessible from Node.js with an elegant API
 - **[commander.js](https://github.com/tj/commander.js)** by TJ Holowaychuk - The standard for building Node.js CLI tools
-
----
-
-## Support
-
-If you find Katsuragi useful:
-
-- Star this repo
-- [Buy us a coffee](https://buymeacoffee.com/enlinks)
 
 ---
 

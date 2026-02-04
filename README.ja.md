@@ -11,6 +11,8 @@
 
 ![ログイン画面のワイヤーフレーム例](./docs/images/login.png)
 
+> コーヒーとPRで動いています。時間が節約できたら[一杯おごって](https://buymeacoffee.com/enlinks)ください。[Starも歓迎](https://github.com/enlinks-llc/katsuragi)！
+
 ## なぜテキストベース？
 
 Katsuragiがテキスト形式なのは、**AIが読み書きできる**からです。
@@ -273,15 +275,6 @@ Katsuragiは多くの素晴らしいオープンソースプロジェクトの�
 - **[libvips](https://github.com/libvips/libvips)** (John Googley-Fletcherほかコントリビューター) - PNG生成を支える高速画像処理エンジン
 - **[sharp](https://github.com/lovell/sharp)** (Lovell Fuller) - libvipsを使いやすいNode.js APIで提供
 - **[commander.js](https://github.com/tj/commander.js)** (TJ Holowaychuk) - Node.js CLIツールのスタンダード
-
----
-
-## サポート
-
-Katsuragiが気に入ったら:
-
-- このリポジトリにStarをお願いします
-- [コーヒーをおごる](https://buymeacoffee.com/enlinks)
 
 ---
 
