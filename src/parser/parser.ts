@@ -32,6 +32,29 @@ function rangesOverlap(a: CellRange, b: CellRange): boolean {
   return !noOverlap;
 }
 
+function validateRangeWithinGrid(
+  range: CellRange,
+  grid: [number, number],
+  rangeStr: string
+): void {
+  const [cols, rows] = grid;
+
+  // Check column bounds (0-indexed, so max valid is cols-1)
+  if (range.start.col >= cols || range.end.col >= cols) {
+    const maxCol = String.fromCharCode('A'.charCodeAt(0) + cols - 1);
+    throw new Error(
+      `Cell "${rangeStr}" exceeds column bounds. Grid is ${cols}x${rows}, valid columns: A-${maxCol}`
+    );
+  }
+
+  // Check row bounds (0-indexed, so max valid is rows-1)
+  if (range.start.row >= rows || range.end.row >= rows) {
+    throw new Error(
+      `Cell "${rangeStr}" exceeds row bounds. Grid is ${cols}x${rows}, valid rows: 1-${rows}`
+    );
+  }
+}
+
 export function parse(input: string): KuiDocument {
   const tokens = tokenize(input);
   let pos = 0;
@@ -199,6 +222,7 @@ export function parse(input: string): KuiDocument {
     if (token.type === TokenType.CELL_REF || token.type === TokenType.CELL_RANGE) {
       advance();
       const component = parseComponent(token);
+      validateRangeWithinGrid(component.range, metadata.grid, token.value);
       components.push(component);
       continue;
     }

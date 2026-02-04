@@ -47,13 +47,43 @@ function escapeXml(text: string): string {
     .replace(/'/g, '&apos;');
 }
 
+function renderMultilineText(
+  text: string,
+  x: number,
+  baseY: number,
+  fontSize: number,
+  textAnchor: string,
+  fill: string,
+  lineHeight = 1.2
+): string {
+  const lines = text.split('\n');
+
+  if (lines.length === 1) {
+    return `<text x="${x}" y="${baseY}" font-size="${fontSize}" text-anchor="${textAnchor}" fill="${fill}">${escapeXml(text)}</text>`;
+  }
+
+  // Multi-line with tspan elements
+  const lineSpacing = fontSize * lineHeight;
+  const totalHeight = (lines.length - 1) * lineSpacing;
+  const startY = baseY - totalHeight / 2;
+
+  const tspans = lines
+    .map((line, i) => {
+      const y = startY + i * lineSpacing;
+      return `<tspan x="${x}" y="${y}">${escapeXml(line)}</tspan>`;
+    })
+    .join('');
+
+  return `<text font-size="${fontSize}" text-anchor="${textAnchor}" fill="${fill}">${tspans}</text>`;
+}
+
 export function renderTxt(component: Component, rect: LayoutRect): string {
   const align = component.props.align ?? 'left';
   const value = component.props.value ?? '';
   const textX = getTextX(rect, align);
   const textY = rect.y + rect.height / 2 + FONT_SIZE / 3;
 
-  return `<text x="${textX}" y="${textY}" font-size="${FONT_SIZE}" text-anchor="${getTextAnchor(align)}" fill="black">${escapeXml(value)}</text>`;
+  return renderMultilineText(value, textX, textY, FONT_SIZE, getTextAnchor(align), 'black');
 }
 
 export function renderBox(component: Component, rect: LayoutRect): string {
@@ -74,9 +104,11 @@ export function renderBtn(component: Component, rect: LayoutRect): string {
   const textX = rect.x + rect.width / 2;
   const textY = rect.y + rect.height / 2 + FONT_SIZE / 3;
 
+  const textElement = renderMultilineText(value, textX, textY, FONT_SIZE, 'middle', textColor);
+
   return `<g>
   <rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${fill}" ${stroke}/>
-  <text x="${textX}" y="${textY}" font-size="${FONT_SIZE}" text-anchor="middle" fill="${textColor}">${escapeXml(value)}</text>
+  ${textElement}
 </g>`;
 }
 

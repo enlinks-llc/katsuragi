@@ -77,6 +77,41 @@ describe('generateSvg', () => {
 
       expect(svg).toContain('text-anchor="end"');
     });
+
+    test('renders txt with newline as multiple tspans', () => {
+      const doc: KuiDocument = {
+        metadata: { ratio: [16, 9], grid: [4, 3] },
+        components: [
+          {
+            type: 'txt',
+            range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
+            props: { value: 'Line 1\nLine 2', align: 'left', style: 'default' },
+          },
+        ],
+      };
+      const svg = generateSvg(doc);
+
+      expect(svg).toContain('<tspan');
+      expect(svg).toContain('>Line 1</tspan>');
+      expect(svg).toContain('>Line 2</tspan>');
+    });
+
+    test('renders single-line txt without tspan', () => {
+      const doc: KuiDocument = {
+        metadata: { ratio: [16, 9], grid: [4, 3] },
+        components: [
+          {
+            type: 'txt',
+            range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
+            props: { value: 'Single line', align: 'left', style: 'default' },
+          },
+        ],
+      };
+      const svg = generateSvg(doc);
+
+      expect(svg).not.toContain('<tspan');
+      expect(svg).toContain('>Single line</text>');
+    });
   });
 
   describe('box component', () => {

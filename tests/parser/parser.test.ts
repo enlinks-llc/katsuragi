@@ -159,5 +159,36 @@ A1..A1: { type: txt, value: "overlap" }`;
       const input = `A1: { type: invalid }`;
       expect(() => parse(input)).toThrow(/invalid.*type/i);
     });
+
+    test('throws on cell reference exceeding grid columns', () => {
+      const input = `grid: 4x3
+E1: { type: txt, value: "out of bounds" }`;
+      expect(() => parse(input)).toThrow(/column.*bounds/i);
+    });
+
+    test('throws on cell reference exceeding grid rows', () => {
+      const input = `grid: 4x3
+A4: { type: txt, value: "out of bounds" }`;
+      expect(() => parse(input)).toThrow(/row.*bounds/i);
+    });
+
+    test('throws on cell range exceeding grid bounds', () => {
+      const input = `grid: 4x3
+A1..E5: { type: txt, value: "out of bounds" }`;
+      expect(() => parse(input)).toThrow(/bounds/i);
+    });
+
+    test('accepts cells at grid edge (D3 on 4x3)', () => {
+      const input = `grid: 4x3
+D3: { type: txt, value: "at edge" }`;
+      const doc = parse(input);
+      expect(doc.components).toHaveLength(1);
+    });
+
+    test('validates against updated grid setting', () => {
+      const input = `grid: 2x2
+C1: { type: txt, value: "out of bounds" }`;
+      expect(() => parse(input)).toThrow(/column.*bounds/i);
+    });
   });
 });
