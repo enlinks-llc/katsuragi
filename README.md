@@ -5,7 +5,7 @@
 [![npm version](https://badge.fury.io/js/katsuragi.svg)](https://www.npmjs.com/package/katsuragi)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
-**Turn text into wireframes. Let AI do the drawing.**
+## Turn text into wireframes. Let AI do the drawing.
 
 ### Who is this for?
 
