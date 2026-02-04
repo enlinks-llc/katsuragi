@@ -74,6 +74,25 @@ A1: { type: txt, value: "Hello" }  // End-of-line comment
 - `align`: `left` (default), `center`, `right`
 - `style`: `default` (light gray), `primary` (black fill), `secondary` (stroke only)
 
+### Multi-line Text
+
+Use `\n` for line breaks in text values:
+
+```kui
+A1: { type: txt, value: "Line 1\nLine 2\nLine 3" }
+```
+
+Or use backticks for multi-line strings:
+
+```kui
+A1: { type: txt, value: `
+  Welcome to
+  Katsuragi
+` }
+```
+
+> **Note:** Automatic text wrapping is not supported. For long text, manually insert `\n` at desired break points.
+
 ### Output Size
 
 The longest edge is fixed at 1280px. The shorter edge is calculated from the ratio:
