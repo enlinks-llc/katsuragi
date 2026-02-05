@@ -1,0 +1,5 @@
+Login form wireframe (16:9 ratio, 4x3 grid):
+- Row 1: "Login" header, centered, spans full width
+- Row 2: Email input field, spans full width
+- Row 3: Password input (3/4 width) + blue Login button (1/4 width, #3B82F6)
+- 8px gap between cells, 16px padding around canvas

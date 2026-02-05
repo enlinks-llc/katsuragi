@@ -1,0 +1,17 @@
+ratio: 16:9
+grid: 4x3
+gap: 8
+padding: 16
+colors: { secondary: "#f5f5f5", outline: "#333" }
+
+// Navigation
+A1: { type: img, alt: "Logo" }
+B1..C1: { type: txt, value: "Dashboard", align: center }
+D1: { type: btn, value: "Logout", border: $outline }
+
+// Sidebar
+A2..A3: { type: box, bg: $secondary }
+
+// Main content area
+B2..D2: { type: txt, value: "Welcome back!", align: left }
+B3..D3: { type: box, border: $outline }

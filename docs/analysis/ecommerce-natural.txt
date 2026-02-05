@@ -1,0 +1,23 @@
+E-commerce product page wireframe (16:9 ratio, 6x5 grid):
+Header row:
+- A1-B1: Logo image (2/6 width)
+- C1-D1: Search input field (2/6 width)
+- E1: Cart button with #333 border (1/6 width)
+- F1: Login button with #3B82F6 background (1/6 width)
+
+Product section:
+- A2-C4: Large product image spanning 3 rows and 3 columns (half width, 3/5 height)
+- D2-F2: Product title "Wireless Headphones" and price "$299.99" (half width)
+- D3-E3: Product description text (2/6 width)
+- F3: Empty box with #f5f5f5 background (1/6 width)
+
+Action buttons:
+- D4: "Add to Cart" button with #3B82F6 background
+- E4: "Buy Now" button with #EF4444 background
+- F4: Star rating "★★★★☆" and "(128 reviews)" centered
+
+Footer:
+- A5-C5: Box with #f5f5f5 background (half width)
+- D5-F5: "Related Products →" text left-aligned (half width)
+
+8px gap between cells, 16px padding around canvas

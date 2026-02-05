@@ -1,0 +1,6 @@
+Dashboard wireframe (16:9 ratio, 4x3 grid):
+- Row 1: Logo image (1/4 width) + "Dashboard" title centered (2/4 width) + "Logout" button with #333 border (1/4 width)
+- Rows 2-3 left column: Sidebar box with #f5f5f5 background, spans 2 rows
+- Row 2 right 3 columns: "Welcome back!" text left-aligned
+- Row 3 right 3 columns: Content box with #333 border
+- 8px gap between cells, 16px padding around canvas

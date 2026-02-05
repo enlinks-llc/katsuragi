@@ -1,0 +1,28 @@
+ratio: 16:9
+grid: 6x5
+gap: 8
+padding: 16
+colors: { primary: "#3B82F6", secondary: "#f5f5f5", danger: "#EF4444", outline: "#333" }
+
+// Header row
+A1..B1: { type: img, alt: "Logo" }
+C1..D1: { type: input, label: "Search..." }
+E1: { type: btn, value: "Cart", border: $outline }
+F1: { type: btn, value: "Login", bg: $primary }
+
+// Product image (large, spans 3 rows)
+A2..C4: { type: img, alt: "Product Photo" }
+
+// Product info
+D2..F2: { type: txt, value: "Wireless Headphones\n$299.99", align: left }
+D3..E3: { type: txt, value: "Premium noise-canceling headphones with 30h battery", align: left }
+F3: { type: box, bg: $secondary }
+
+// Actions
+D4: { type: btn, value: "Add to Cart", bg: $primary }
+E4: { type: btn, value: "Buy Now", bg: $danger }
+F4: { type: txt, value: "★★★★☆\n(128 reviews)", align: center }
+
+// Footer
+A5..C5: { type: box, bg: $secondary }
+D5..F5: { type: txt, value: "Related Products →", align: left }
