@@ -18,6 +18,12 @@ Turn UI ideas into wireframes with a text format AI actually understands.
 ### Why .kui?
 
 ```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      plotColorPalette: "#9CA3AF, #9CA3AF, #3B82F6, #F87171"
+---
 xychart-beta
     title "Tokens per wireframe (login example)"
     x-axis ["Natural Lang", "ASCII", ".kui", "HTML"]

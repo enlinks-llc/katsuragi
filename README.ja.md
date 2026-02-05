@@ -18,6 +18,12 @@ AIが本当に理解できるテキスト形式で、UIアイデアをワイヤ�
 ### なぜ .kui？
 
 ```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      plotColorPalette: "#9CA3AF, #9CA3AF, #3B82F6, #F87171"
+---
 xychart-beta
     title "ワイヤーフレームあたりのトークン数（login例）"
     x-axis ["自然言語", "ASCII", ".kui", "HTML"]
