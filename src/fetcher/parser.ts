@@ -1,37 +1,42 @@
 import { HTMLElement, parse as parseHtml } from 'node-html-parser';
-import type { DomElement, ViewportConfig } from './types.js';
+import type { DomElement, ViewportConfig, ParseOptions } from './types.js';
+
+/** Element priority levels (higher = more important) */
+const ELEMENT_PRIORITY: Record<string, number> = {
+  // Highest priority: structural landmarks
+  header: 100,
+  nav: 95,
+  main: 90,
+  footer: 85,
+  // High priority: headings and forms
+  h1: 80,
+  h2: 75,
+  h3: 70,
+  form: 65,
+  // Medium priority: content sections
+  section: 60,
+  article: 55,
+  aside: 50,
+  // Medium priority: interactive elements
+  button: 45,
+  input: 40,
+  textarea: 38,
+  select: 35,
+  // Medium priority: media
+  img: 30,
+  // Lower priority: text elements
+  h4: 25,
+  h5: 24,
+  h6: 23,
+  p: 20,
+  // Lowest priority: inline elements
+  a: 10,
+  span: 5,
+  label: 5,
+};
 
 /** Tags to extract as visual elements */
-const VISUAL_TAGS = new Set([
-  // Structural
-  'header',
-  'nav',
-  'main',
-  'footer',
-  'section',
-  'article',
-  'aside',
-  'form',
-  // Interactive
-  'button',
-  // Input
-  'input',
-  'textarea',
-  'select',
-  // Media
-  'img',
-  // Text (only when containing text)
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'p',
-  'span',
-  'label',
-  'a',
-]);
+const VISUAL_TAGS = new Set(Object.keys(ELEMENT_PRIORITY));
 
 /** Tags that are considered containers (can have children) */
 const CONTAINER_TAGS = new Set([
@@ -54,6 +59,10 @@ const SKIP_TAGS = new Set([
   'meta',
   'link',
   'head',
+  'svg',
+  'path',
+  'template',
+  'iframe',
 ]);
 
 /** Approximate element heights by tag */
@@ -85,6 +94,12 @@ const ELEMENT_HEIGHTS: Record<string, number> = {
 
 /** Default element height */
 const DEFAULT_HEIGHT = 50;
+
+/** Default parse options */
+const DEFAULT_OPTIONS: Required<ParseOptions> = {
+  maxDepth: 4,
+  maxElements: 50,
+};
 
 /** Current Y position tracker for layout estimation */
 interface LayoutState {
@@ -147,13 +162,20 @@ function estimateBounds(
 }
 
 /**
- * Process a single HTML element
+ * Process a single HTML element with depth tracking
  */
 function processElement(
   element: HTMLElement,
   state: LayoutState,
   results: DomElement[],
+  depth: number,
+  maxDepth: number,
 ): void {
+  // Stop if we've reached max depth
+  if (depth > maxDepth) {
+    return;
+  }
+
   const tagName = element.tagName?.toLowerCase();
 
   // Skip non-elements or ignored tags
@@ -172,10 +194,10 @@ function processElement(
     )
   ) {
     if (!hasTextContent(element, tagName)) {
-      // Still process children
+      // Still process children (but respect depth limit)
       for (const child of element.childNodes) {
         if (child instanceof HTMLElement) {
-          processElement(child, state, results);
+          processElement(child, state, results, depth + 1, maxDepth);
         }
       }
       return;
@@ -183,6 +205,8 @@ function processElement(
   }
 
   if (isVisual) {
+    const priority = ELEMENT_PRIORITY[tagName] ?? 0;
+
     const domElement: DomElement = {
       tagName,
       bounds: estimateBounds(element, tagName, state),
@@ -194,6 +218,8 @@ function processElement(
         src: element.getAttribute('src') ?? undefined,
         type: element.getAttribute('type') ?? undefined,
       },
+      priority,
+      depth,
     };
 
     results.push(domElement);
@@ -203,7 +229,7 @@ function processElement(
   if (isContainer || !isVisual) {
     for (const child of element.childNodes) {
       if (child instanceof HTMLElement) {
-        processElement(child, state, results);
+        processElement(child, state, results, depth + 1, maxDepth);
       }
     }
   }
@@ -215,7 +241,10 @@ function processElement(
 export function parseHtmlToDom(
   html: string,
   viewport: ViewportConfig,
+  options?: ParseOptions,
 ): DomElement[] {
+  const opts = { ...DEFAULT_OPTIONS, ...options };
+
   const root = parseHtml(html, {
     lowerCaseTagName: true,
     comment: false,
@@ -233,9 +262,17 @@ export function parseHtmlToDom(
 
   for (const child of body.childNodes) {
     if (child instanceof HTMLElement) {
-      processElement(child, state, results);
+      processElement(child, state, results, 0, opts.maxDepth);
     }
   }
 
-  return results;
+  // Sort by priority (highest first) and limit to maxElements
+  const sorted = results
+    .sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
+    .slice(0, opts.maxElements);
+
+  // Re-sort by Y position for layout
+  sorted.sort((a, b) => a.bounds.y - b.bounds.y);
+
+  return sorted;
 }

@@ -27,6 +27,18 @@ export interface DomElement {
     src?: string;
     type?: string;
   };
+  /** Priority for placement (higher = more important) */
+  priority?: number;
+  /** Nesting depth in DOM tree */
+  depth?: number;
+}
+
+/** Options for HTML parsing */
+export interface ParseOptions {
+  /** Maximum nesting depth to process (default: 4) */
+  maxDepth?: number;
+  /** Maximum number of elements to return (default: 50) */
+  maxElements?: number;
 }
 
 /** Viewport configuration */

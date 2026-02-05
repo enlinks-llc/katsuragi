@@ -63,28 +63,23 @@ export function mapToComponent(placement: GridPlacement): Component {
   // Add type-specific properties
   switch (componentType) {
     case 'input':
-      // Use placeholder as label
-      if (element.attributes.placeholder) {
-        component.props.label = element.attributes.placeholder;
-      }
+      // Use dummy label for inputs
+      component.props.label = '[input]';
       break;
 
     case 'img':
-      // Include src and alt if available
-      if (element.attributes.src) {
-        component.props.src = element.attributes.src;
-      }
-      if (element.attributes.alt) {
-        component.props.alt = element.attributes.alt;
-      }
+      // Use dummy placeholder for images
+      component.props.alt = '[image]';
       break;
 
     case 'btn':
-      // Buttons don't include value (as per plan: "テキスト内容は取得しない")
+      // Use dummy value for buttons
+      component.props.value = '[button]';
       break;
 
     case 'txt':
-      // Text elements don't include value (as per plan: "txt タイプとして位置のみ記録")
+      // Use dummy value for text
+      component.props.value = '[text]';
       break;
 
     case 'box':

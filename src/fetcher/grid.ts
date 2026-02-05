@@ -8,11 +8,11 @@ import type {
 /** Maximum grid size (26 columns = A-Z) */
 const MAX_GRID_SIZE = 26;
 
-/** Minimum cell size in viewport percentage */
-const MIN_CELL_PCT = 5; // 5% of viewport
+/** Minimum cell size in viewport percentage (base value) */
+const BASE_MIN_CELL_PCT = 5; // 5% of viewport
 
 /**
- * Calculate optimal grid size based on element positions
+ * Calculate optimal grid size based on element positions and count
  */
 function calculateOptimalGridSize(
   elements: DomElement[],
@@ -21,6 +21,17 @@ function calculateOptimalGridSize(
   if (elements.length === 0) {
     return { cols: 4, rows: 3 }; // Default grid
   }
+
+  // Calculate minimum grid size based on element count
+  // Ensure at least sqrt(n) x sqrt(n) grid to fit n elements
+  const minSize = Math.ceil(Math.sqrt(elements.length));
+  const minCols = Math.max(minSize, 4);
+  const minRows = Math.max(minSize, 3);
+
+  // Adjust MIN_CELL_PCT based on element count
+  // More elements = smaller minimum cell size
+  const adjustedMinCellPct =
+    elements.length > 30 ? 3 : elements.length > 15 ? 4 : BASE_MIN_CELL_PCT;
 
   // Find all unique X and Y breakpoints
   const xBreaks = new Set<number>();
@@ -34,8 +45,8 @@ function calculateOptimalGridSize(
   }
 
   // Filter out breakpoints that are too close together
-  const minXGap = viewport.width * (MIN_CELL_PCT / 100);
-  const minYGap = viewport.height * (MIN_CELL_PCT / 100);
+  const minXGap = viewport.width * (adjustedMinCellPct / 100);
+  const minYGap = viewport.height * (adjustedMinCellPct / 100);
 
   const sortedX = [...xBreaks].sort((a, b) => a - b);
   const sortedY = [...yBreaks].sort((a, b) => a - b);
@@ -44,14 +55,17 @@ function calculateOptimalGridSize(
   const filteredY = filterCloseValues(sortedY, minYGap);
 
   // Grid size is number of intervals (breakpoints - 1), clamped to MAX_GRID_SIZE
-  const cols = Math.min(Math.max(filteredX.length - 1, 1), MAX_GRID_SIZE);
-  const rows = Math.min(Math.max(filteredY.length - 1, 1), MAX_GRID_SIZE);
+  // Ensure at least minCols x minRows
+  const cols = Math.min(
+    Math.max(filteredX.length - 1, minCols),
+    MAX_GRID_SIZE,
+  );
+  const rows = Math.min(
+    Math.max(filteredY.length - 1, minRows),
+    MAX_GRID_SIZE,
+  );
 
-  // Ensure reasonable defaults
-  return {
-    cols: Math.max(cols, 2),
-    rows: Math.max(rows, 2),
-  };
+  return { cols, rows };
 }
 
 /**
@@ -118,60 +132,135 @@ function overlaps(a: GridPlacement, b: GridPlacement): boolean {
 }
 
 /**
+ * Find nearest free cell to the target position
+ */
+function findNearestFreeCell(
+  targetCol: number,
+  targetRow: number,
+  placed: GridPlacement[],
+  cols: number,
+  rows: number,
+): { col: number; row: number } | null {
+  // BFS to find nearest free cell
+  const visited = new Set<string>();
+  const queue: Array<{ col: number; row: number }> = [
+    { col: targetCol, row: targetRow },
+  ];
+
+  while (queue.length > 0) {
+    const { col, row } = queue.shift()!;
+    const key = `${col},${row}`;
+
+    if (visited.has(key)) continue;
+    visited.add(key);
+
+    // Check if this cell is free
+    const test: GridPlacement = {
+      element: {} as DomElement,
+      col,
+      row,
+      colSpan: 1,
+      rowSpan: 1,
+    };
+
+    if (!placed.some((existing) => overlaps(existing, test))) {
+      return { col, row };
+    }
+
+    // Add adjacent cells (prioritize same row, then nearby rows)
+    const directions = [
+      { dc: 1, dr: 0 }, // right
+      { dc: -1, dr: 0 }, // left
+      { dc: 0, dr: 1 }, // down
+      { dc: 0, dr: -1 }, // up
+    ];
+
+    for (const { dc, dr } of directions) {
+      const nc = col + dc;
+      const nr = row + dr;
+      if (nc >= 0 && nc < cols && nr >= 0 && nr < rows) {
+        queue.push({ col: nc, row: nr });
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
  * Resolve overlapping placements by adjusting positions
- * Returns placements that fit and warnings for elements that couldn't be placed
+ * Uses priority-based placement and nearest-cell search
  */
 function resolveOverlaps(
   placements: GridPlacement[],
   cols: number,
   rows: number,
 ): { placements: GridPlacement[]; skipped: number } {
+  // Sort by priority (high priority first)
+  const sorted = [...placements].sort(
+    (a, b) => (b.element.priority ?? 0) - (a.element.priority ?? 0),
+  );
+
   const result: GridPlacement[] = [];
   let skipped = 0;
 
-  for (const placement of placements) {
+  for (const placement of sorted) {
     let adjusted = { ...placement };
-    let placed = false;
-
-    // Find non-overlapping position
-    let attempts = 0;
-    while (
-      result.some((existing) => overlaps(existing, adjusted)) &&
-      attempts < rows * 2
-    ) {
-      // Move down by one row
-      adjusted.row = Math.min(adjusted.row + 1, rows - adjusted.rowSpan);
-      attempts++;
-    }
 
     // Check if current position is free
     if (!result.some((existing) => overlaps(existing, adjusted))) {
-      placed = true;
-    } else {
-      // Reduce span and try to find any free cell
-      adjusted.colSpan = 1;
-      adjusted.rowSpan = 1;
+      result.push(adjusted);
+      continue;
+    }
 
-      // Search all cells for a free spot
-      outerLoop: for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const test = { ...adjusted, col: c, row: r };
-          if (!result.some((existing) => overlaps(existing, test))) {
-            adjusted = test;
-            placed = true;
-            break outerLoop;
-          }
-        }
+    // Try to keep original span and find nearby position
+    let placed = false;
+
+    // First: try moving down within a few rows
+    for (let rowOffset = 1; rowOffset <= 3 && !placed; rowOffset++) {
+      const newRow = Math.min(adjusted.row + rowOffset, rows - adjusted.rowSpan);
+      const test = { ...adjusted, row: newRow };
+      if (!result.some((existing) => overlaps(existing, test))) {
+        adjusted = test;
+        placed = true;
+      }
+    }
+
+    // Second: reduce to 1x1 and find nearest free cell
+    if (!placed) {
+      const nearest = findNearestFreeCell(
+        placement.col,
+        placement.row,
+        result,
+        cols,
+        rows,
+      );
+
+      if (nearest) {
+        adjusted = {
+          ...adjusted,
+          col: nearest.col,
+          row: nearest.row,
+          colSpan: 1,
+          rowSpan: 1,
+        };
+        placed = true;
       }
     }
 
     if (placed) {
       result.push(adjusted);
     } else {
-      // Grid is full, skip this element
+      // Grid is full, skip this element (low priority elements get skipped)
       skipped++;
     }
   }
+
+  // Re-sort result by position for consistent output
+  result.sort((a, b) => {
+    if (a.row !== b.row) return a.row - b.row;
+    return a.col - b.col;
+  });
 
   return { placements: result, skipped };
 }

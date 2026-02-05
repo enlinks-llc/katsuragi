@@ -156,6 +156,9 @@ ktr fetch https://example.com -o mobile.kui --viewport mobile
 
 # Override grid and ratio
 ktr fetch https://example.com -o custom.kui --grid 6x4 --ratio 4:3
+
+# Control extraction depth and element count
+ktr fetch https://example.com -o simple.kui --max-elements 30 --max-depth 3
 ```
 
 **Fetch Options:**
@@ -166,20 +169,22 @@ ktr fetch https://example.com -o custom.kui --grid 6x4 --ratio 4:3
 | `--viewport <type>` | Target viewport: `desktop`, `mobile`, `tablet` (default: `desktop`) |
 | `--grid <grid>` | Override grid size (e.g., `4x3`, max `26x26`) |
 | `--ratio <ratio>` | Override aspect ratio (e.g., `16:9`) |
+| `--max-elements <n>` | Maximum elements to extract (default: `50`) |
+| `--max-depth <n>` | Maximum DOM nesting depth (default: `4`) |
 
 **How it works:**
 
 1. Fetches HTML from the URL (no JavaScript execution)
-2. Extracts visual elements (headers, forms, buttons, inputs, images, text)
+2. Extracts visual elements with priority-based filtering (header/nav/main prioritized)
 3. Estimates layout positions based on document flow
-4. Maps elements to .kui components
-5. Outputs a .kui file you can edit and render
+4. Uses intelligent grid placement with overlap resolution
+5. Outputs a .kui file with dummy placeholders (no external content)
 
 **Limitations:**
 
-- Static HTML only (SPAs won't work properly)
+- Static HTML only (SPAs with client-side rendering won't work properly)
 - No CSS analysis - layout is estimated from document structure
-- Text content is not extracted (only element positions)
+- Content is replaced with dummy placeholders for privacy
 - Maximum grid size: 26×26
 
 ## Why Text-Based?

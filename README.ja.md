@@ -156,6 +156,9 @@ ktr fetch https://example.com -o mobile.kui --viewport mobile
 
 # グリッドとratioをオーバーライド
 ktr fetch https://example.com -o custom.kui --grid 6x4 --ratio 4:3
+
+# 抽出する要素数と深度を制御
+ktr fetch https://example.com -o simple.kui --max-elements 30 --max-depth 3
 ```
 
 **Fetchオプション:**
@@ -166,20 +169,22 @@ ktr fetch https://example.com -o custom.kui --grid 6x4 --ratio 4:3
 | `--viewport <type>` | ビューポート: `desktop`, `mobile`, `tablet`（デフォルト: `desktop`） |
 | `--grid <grid>` | グリッドサイズ上書き（例: `4x3`、最大 `26x26`） |
 | `--ratio <ratio>` | アスペクト比上書き（例: `16:9`） |
+| `--max-elements <n>` | 抽出する最大要素数（デフォルト: `50`） |
+| `--max-depth <n>` | DOMの最大ネスト深度（デフォルト: `4`） |
 
 **動作の仕組み:**
 
 1. URLからHTMLを取得（JavaScript実行なし）
-2. 視覚要素を抽出（header, form, button, input, img, textなど）
+2. 優先度に基づいて視覚要素を抽出（header/nav/mainを優先）
 3. ドキュメント構造からレイアウト位置を推定
-4. 要素を.kuiコンポーネントにマッピング
-5. 編集・レンダリング可能な.kuiファイルを出力
+4. スマートなグリッド配置で重複を解決
+5. ダミープレースホルダー付きの.kuiファイルを出力（外部コンテンツなし）
 
 **制限事項:**
 
-- 静的HTMLのみ対応（SPAは正しく動作しません）
+- 静的HTMLのみ対応（クライアントサイドレンダリングのSPAは正しく動作しません）
 - CSS解析なし - レイアウトはドキュメント構造から推定
-- テキスト内容は抽出されません（要素の位置のみ）
+- コンテンツはプライバシー保護のためダミー値に置換
 - 最大グリッドサイズ: 26×26
 
 ## なぜテキストベース？

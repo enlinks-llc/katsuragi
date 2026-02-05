@@ -138,40 +138,40 @@ describe('mapToComponent', () => {
   });
 
   describe('properties', () => {
-    it('adds label from placeholder for input', () => {
+    it('adds dummy label for input', () => {
       const placement = createPlacement('input', 0, 0, 2, 1, {
         placeholder: 'Enter email',
       });
       const component = mapToComponent(placement);
 
-      expect(component.props.label).toBe('Enter email');
+      expect(component.props.label).toBe('[input]');
     });
 
-    it('adds src and alt for img', () => {
+    it('adds dummy alt for img', () => {
       const placement = createPlacement('img', 0, 0, 2, 2, {
         src: 'logo.png',
         alt: 'Company Logo',
       });
       const component = mapToComponent(placement);
 
-      expect(component.props.src).toBe('logo.png');
-      expect(component.props.alt).toBe('Company Logo');
+      expect(component.props.src).toBeUndefined();
+      expect(component.props.alt).toBe('[image]');
     });
 
-    it('does not include value for txt (position only)', () => {
+    it('adds dummy value for txt', () => {
       const placement = createPlacement('h1', 0, 0, 4, 1);
       placement.element.textContent = 'Title';
       const component = mapToComponent(placement);
 
-      expect(component.props.value).toBeUndefined();
+      expect(component.props.value).toBe('[text]');
     });
 
-    it('does not include value for btn (position only)', () => {
+    it('adds dummy value for btn', () => {
       const placement = createPlacement('button', 0, 0, 1, 1);
       placement.element.textContent = 'Submit';
       const component = mapToComponent(placement);
 
-      expect(component.props.value).toBeUndefined();
+      expect(component.props.value).toBe('[button]');
     });
   });
 });
@@ -189,8 +189,9 @@ describe('mapAllToComponents', () => {
     expect(components).toHaveLength(3);
     expect(components[0].type).toBe('box');
     expect(components[1].type).toBe('input');
-    expect(components[1].props.label).toBe('Email');
+    expect(components[1].props.label).toBe('[input]');
     expect(components[2].type).toBe('btn');
+    expect(components[2].props.value).toBe('[button]');
   });
 
   it('returns empty array for empty input', () => {

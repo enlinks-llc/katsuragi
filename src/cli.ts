@@ -167,6 +167,8 @@ interface FetchOptions {
   grid?: string;
   ratio?: string;
   viewport?: string;
+  maxElements?: string;
+  maxDepth?: string;
 }
 
 const fetchCommand = new Command('fetch')
@@ -180,6 +182,8 @@ const fetchCommand = new Command('fetch')
     'Target viewport: desktop, mobile, tablet',
     'desktop',
   )
+  .option('--max-elements <n>', 'Maximum number of elements to extract', '50')
+  .option('--max-depth <n>', 'Maximum DOM nesting depth', '4')
   .action(async (url: string, options: FetchOptions) => {
     try {
       // Validate viewport
@@ -228,8 +232,32 @@ const fetchCommand = new Command('fetch')
       // Fetch HTML
       const result = await fetchHtml(url, { viewport: viewportType });
 
+      // Parse and validate max-elements and max-depth
+      let maxElements: number | undefined;
+      if (options.maxElements) {
+        maxElements = parseInt(options.maxElements, 10);
+        if (Number.isNaN(maxElements) || maxElements < 1) {
+          console.error(
+            `Error: Invalid --max-elements value "${options.maxElements}". Must be a positive integer.`,
+          );
+          process.exit(1);
+        }
+      }
+
+      let maxDepth: number | undefined;
+      if (options.maxDepth) {
+        maxDepth = parseInt(options.maxDepth, 10);
+        if (Number.isNaN(maxDepth) || maxDepth < 1) {
+          console.error(
+            `Error: Invalid --max-depth value "${options.maxDepth}". Must be a positive integer.`,
+          );
+          process.exit(1);
+        }
+      }
+
       // Parse HTML to DOM elements
-      const elements = parseHtmlToDom(result.html, result.viewport);
+      const parseOptions = { maxElements, maxDepth };
+      const elements = parseHtmlToDom(result.html, result.viewport, parseOptions);
 
       if (elements.length === 0) {
         console.error('Error: No visual elements found in HTML');
