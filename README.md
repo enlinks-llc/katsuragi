@@ -22,13 +22,15 @@ Turn UI ideas into wireframes with a text format AI actually understands.
 config:
   themeVariables:
     xyChart:
-      plotColorPalette: "#9CA3AF, #9CA3AF, #3B82F6, #F87171"
+      plotColorPalette: "#9CA3AF, #3B82F6, #F87171"
 ---
 xychart-beta
     title "Tokens per wireframe (login example)"
     x-axis ["Natural Lang", "ASCII", ".kui", "HTML"]
     y-axis "Tokens" 0 --> 400
-    bar [102, 84, 120, 330]
+    bar [102, 84, 0, 0]
+    bar [0, 0, 120, 0]
+    bar [0, 0, 0, 330]
 ```
 
 .kui hits the sweet spot between efficiency and reliability:
