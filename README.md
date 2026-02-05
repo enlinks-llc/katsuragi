@@ -79,6 +79,9 @@ If this tool saves you time:
 
 [Star this repo](https://github.com/enlinks-llc/katsuragi) to help others find it!
 
+> **Note from a developer in Japan:** I tried to set up GitHub Sponsors and Buy Me a Coffee, but Stripe doesn't support my bank. Couldn't configure the payout account.
+> I'm gonna cry.
+
 ---
 
 ## Quick Start

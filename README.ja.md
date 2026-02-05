@@ -79,6 +79,9 @@ npx ktr login.kui -o login.png
 
 [Starで応援](https://github.com/enlinks-llc/katsuragi)してくれると嬉しいです！
 
+> **日本の開発者からのお知らせ：** GitHub SponsorsもBuy Me a Coffeeもちゃんと設定しようとしたんですが、Stripeがうちで使っている銀行に対応してくれてなくて受け取り口座の設定できませんでした。
+泣くぞ
+
 ---
 
 ## クイックスタート
