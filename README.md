@@ -35,8 +35,8 @@ xychart-beta
 
 .kui hits the sweet spot between efficiency and reliability:
 
-| Format | Tokens | Precise | Editable |
-|--------|--------|---------|----------|
+| Format | Tokens | Precise | Stable |
+|--------|--------|---------|--------|
 | Natural Language | 102 | ❌ | ❌ |
 | ASCII Art | 84 | ⚠️ | ❌ |
 | **.kui** | **120** | **✓** | **✓** |
