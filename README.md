@@ -52,9 +52,13 @@ Write a `.kui` file:
 
 ```kui
 ratio: 16:9
-grid: 2x2
-A1: { type: txt, value: "Login", align: center }
-A2..B2: { type: btn, value: "Submit" }
+grid: 4x3
+colors: { primary: "#3B82F6" }
+
+A1..D1: { type: txt, value: "Login", align: center }
+A2..D2: { type: input, label: "Email" }
+A3..C3: { type: input, label: "Password" }
+D3: { type: btn, value: "Login", bg: $primary }
 ```
 
 Run one command:
