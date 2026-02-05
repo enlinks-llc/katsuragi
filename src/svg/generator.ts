@@ -1,17 +1,26 @@
-import type { KuiDocument, Component, LayoutRect, LayoutConfig, RenderContext } from '../types.js';
-import { calculateCanvasSize, calculateCellRect } from '../layout/calculator.js';
 import {
-  renderTxt,
+  calculateCanvasSize,
+  calculateCellRect,
+} from '../layout/calculator.js';
+import type {
+  Component,
+  KuiDocument,
+  LayoutConfig,
+  LayoutRect,
+  RenderContext,
+} from '../types.js';
+import {
   renderBox,
   renderBtn,
-  renderInput,
   renderImg,
+  renderInput,
+  renderTxt,
 } from './components.js';
 
 function renderComponent(
   component: Component,
   rect: LayoutRect,
-  context?: RenderContext
+  context?: RenderContext,
 ): string {
   switch (component.type) {
     case 'txt':
@@ -47,7 +56,7 @@ export function generateSvg(doc: KuiDocument, basePath?: string): string {
         doc.metadata.grid,
         canvas,
         config,
-        component.props.padding
+        component.props.padding,
       );
       return renderComponent(component, rect, context);
     })

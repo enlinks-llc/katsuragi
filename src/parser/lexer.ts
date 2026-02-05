@@ -105,7 +105,9 @@ export function tokenize(input: string): Token[] {
       }
     }
     if (pos >= input.length) {
-      throw new Error(`Unterminated string at ${startLoc.line}:${startLoc.column}`);
+      throw new Error(
+        `Unterminated string at ${startLoc.line}:${startLoc.column}`,
+      );
     }
     advance(); // consume closing quote
     return value;
@@ -118,7 +120,9 @@ export function tokenize(input: string): Token[] {
       value += advance();
     }
     if (pos >= input.length) {
-      throw new Error(`Unterminated string at ${startLoc.line}:${startLoc.column}`);
+      throw new Error(
+        `Unterminated string at ${startLoc.line}:${startLoc.column}`,
+      );
     }
     advance(); // consume closing backtick
     return value;
@@ -126,10 +130,7 @@ export function tokenize(input: string): Token[] {
 
   function readWord(): string {
     let word = '';
-    while (
-      pos < input.length &&
-      /[a-zA-Z0-9_]/.test(peek())
-    ) {
+    while (pos < input.length && /[a-zA-Z0-9_]/.test(peek())) {
       word += advance();
     }
     return word;
@@ -226,7 +227,9 @@ export function tokenize(input: string): Token[] {
       }
       const hex = value.slice(1);
       if (!/^[0-9A-Fa-f]{3}$/.test(hex) && !/^[0-9A-Fa-f]{6}$/.test(hex)) {
-        throw new Error(`Invalid hex color: ${value} at ${loc.line}:${loc.column}`);
+        throw new Error(
+          `Invalid hex color: ${value} at ${loc.line}:${loc.column}`,
+        );
       }
       tokens.push({ type: TokenType.HEX_COLOR, value, loc });
       continue;
@@ -252,16 +255,28 @@ export function tokenize(input: string): Token[] {
       const startLine = line;
       const startColumn = column;
       const value = readCellRefOrRange();
-      const startLoc = { line: startLine, column: startColumn, offset: startPos };
+      const startLoc = {
+        line: startLine,
+        column: startColumn,
+        offset: startPos,
+      };
 
       // Check if it's a cell range
       if (CELL_RANGE_PATTERN.test(value)) {
-        tokens.push({ type: TokenType.CELL_RANGE, value: value.toUpperCase(), loc: startLoc });
+        tokens.push({
+          type: TokenType.CELL_RANGE,
+          value: value.toUpperCase(),
+          loc: startLoc,
+        });
         continue;
       }
       // Check if it's a cell ref
       if (CELL_REF_PATTERN.test(value)) {
-        tokens.push({ type: TokenType.CELL_REF, value: value.toUpperCase(), loc: startLoc });
+        tokens.push({
+          type: TokenType.CELL_REF,
+          value: value.toUpperCase(),
+          loc: startLoc,
+        });
         continue;
       }
       // Otherwise it's an identifier - but we need to handle the word properly
@@ -295,7 +310,9 @@ export function tokenize(input: string): Token[] {
     }
 
     // Unknown character
-    throw new Error(`Unexpected character: '${ch}' at ${loc.line}:${loc.column}`);
+    throw new Error(
+      `Unexpected character: '${ch}' at ${loc.line}:${loc.column}`,
+    );
   }
 
   tokens.push({ type: TokenType.EOF, value: '', loc: currentLocation() });

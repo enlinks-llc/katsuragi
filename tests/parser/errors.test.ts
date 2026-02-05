@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { parse, KuiSyntaxError } from '../../src/parser/index.js';
+import { KuiSyntaxError, parse } from '../../src/parser/index.js';
 
 describe('KuiSyntaxError', () => {
   describe('error messages include location', () => {

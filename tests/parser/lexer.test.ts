@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { TokenType, tokenize, type Token } from '../../src/parser/lexer.js';
+import { type Token, TokenType, tokenize } from '../../src/parser/lexer.js';
 
 // Helper to extract only type and value from tokens for comparison
 function tokensWithoutLoc(tokens: Token[]): { type: string; value: string }[] {
@@ -197,7 +197,9 @@ describe('tokenize', () => {
 
   describe('complete component definition', () => {
     test('tokenizes full component line', () => {
-      const tokens = tokenize('A1..B2: { type: txt, value: "Login", align: center }');
+      const tokens = tokenize(
+        'A1..B2: { type: txt, value: "Login", align: center }',
+      );
       expect(tokensWithoutLoc(tokens)).toEqual([
         { type: TokenType.CELL_RANGE, value: 'A1..B2' },
         { type: TokenType.COLON, value: ':' },
@@ -272,12 +274,14 @@ describe('tokenize', () => {
   describe('error handling', () => {
     test('throws on unterminated string', () => {
       expect(() => tokenize('{ value: "unterminated }')).toThrow(
-        /Unterminated string at 1:\d+/
+        /Unterminated string at 1:\d+/,
       );
     });
 
     test('throws on invalid character', () => {
-      expect(() => tokenize('ratio: @invalid')).toThrow(/Unexpected character.*at 1:\d+/);
+      expect(() => tokenize('ratio: @invalid')).toThrow(
+        /Unexpected character.*at 1:\d+/,
+      );
     });
   });
 

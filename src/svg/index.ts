@@ -1,8 +1,8 @@
-export { generateSvg } from './generator.js';
 export {
-  renderTxt,
   renderBox,
   renderBtn,
-  renderInput,
   renderImg,
+  renderInput,
+  renderTxt,
 } from './components.js';
+export { generateSvg } from './generator.js';

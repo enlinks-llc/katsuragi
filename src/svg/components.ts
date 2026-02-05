@@ -1,5 +1,5 @@
-import type { Component, LayoutRect, Align, RenderContext } from '../types.js';
-import { resolveImagePath, loadImageAsDataUri } from '../utils/image.js';
+import type { Align, Component, LayoutRect, RenderContext } from '../types.js';
+import { loadImageAsDataUri, resolveImagePath } from '../utils/image.js';
 
 const STROKE_WIDTH = 2;
 const BORDER_RADIUS = 8;
@@ -46,7 +46,7 @@ function renderMultilineText(
   fontSize: number,
   textAnchor: string,
   fill: string,
-  lineHeight = 1.2
+  lineHeight = 1.2,
 ): string {
   const lines = text.split('\n');
 
@@ -81,11 +81,24 @@ export function renderTxt(component: Component, rect: LayoutRect): string {
 
   // Add background rect if bg or border is specified
   if (bg || border) {
-    const strokeAttr = border ? `stroke="${border}" stroke-width="${STROKE_WIDTH}"` : '';
-    parts.push(`<rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${bg ?? 'transparent'}" ${strokeAttr}/>`);
+    const strokeAttr = border
+      ? `stroke="${border}" stroke-width="${STROKE_WIDTH}"`
+      : '';
+    parts.push(
+      `<rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${bg ?? 'transparent'}" ${strokeAttr}/>`,
+    );
   }
 
-  parts.push(renderMultilineText(value, textX, textY, FONT_SIZE, getTextAnchor(align), 'black'));
+  parts.push(
+    renderMultilineText(
+      value,
+      textX,
+      textY,
+      FONT_SIZE,
+      getTextAnchor(align),
+      'black',
+    ),
+  );
 
   if (parts.length === 1) {
     return parts[0];
@@ -96,7 +109,9 @@ export function renderTxt(component: Component, rect: LayoutRect): string {
 export function renderBox(component: Component, rect: LayoutRect): string {
   const fill = component.props.bg ?? DEFAULT_BG;
   const border = component.props.border;
-  const strokeAttr = border ? `stroke="${border}" stroke-width="${STROKE_WIDTH}"` : '';
+  const strokeAttr = border
+    ? `stroke="${border}" stroke-width="${STROKE_WIDTH}"`
+    : '';
 
   return `<rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${fill}" ${strokeAttr}/>`;
 }
@@ -105,13 +120,22 @@ export function renderBtn(component: Component, rect: LayoutRect): string {
   const value = component.props.value ?? '';
   const fill = component.props.bg ?? DEFAULT_BG;
   const border = component.props.border;
-  const strokeAttr = border ? `stroke="${border}" stroke-width="${STROKE_WIDTH}"` : '';
+  const strokeAttr = border
+    ? `stroke="${border}" stroke-width="${STROKE_WIDTH}"`
+    : '';
   const textColor = 'black'; // Text color is always black
 
   const textX = rect.x + rect.width / 2;
   const textY = rect.y + rect.height / 2 + FONT_SIZE / 3;
 
-  const textElement = renderMultilineText(value, textX, textY, FONT_SIZE, 'middle', textColor);
+  const textElement = renderMultilineText(
+    value,
+    textX,
+    textY,
+    FONT_SIZE,
+    'middle',
+    textColor,
+  );
 
   return `<g>
   <rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="${BORDER_RADIUS}" fill="${fill}" ${strokeAttr}/>
@@ -134,7 +158,12 @@ export function renderInput(component: Component, rect: LayoutRect): string {
 </g>`;
 }
 
-function renderImgPlaceholder(rect: LayoutRect, alt: string, bg?: string, border?: string): string {
+function renderImgPlaceholder(
+  rect: LayoutRect,
+  alt: string,
+  bg?: string,
+  border?: string,
+): string {
   const textX = rect.x + rect.width / 2;
   const textY = rect.y + rect.height / 2 + FONT_SIZE / 3;
   const fill = bg ?? '#f0f0f0';
@@ -149,7 +178,7 @@ function renderImgPlaceholder(rect: LayoutRect, alt: string, bg?: string, border
 export function renderImg(
   component: Component,
   rect: LayoutRect,
-  context?: RenderContext
+  context?: RenderContext,
 ): string {
   const { src, alt, bg, border } = component.props;
   const altText = alt ?? src ?? 'image';

@@ -15,14 +15,19 @@ export function resolveImagePath(src: string, basePath?: string): string {
 
   // Relative paths require basePath
   if (!basePath) {
-    throw new Error(`Cannot resolve relative image path without base path: ${src}`);
+    throw new Error(
+      `Cannot resolve relative image path without base path: ${src}`,
+    );
   }
 
   const normalizedBase = path.resolve(basePath);
   const resolved = path.resolve(normalizedBase, src);
 
   // Prevent path traversal attacks (../ escaping basePath)
-  if (!resolved.startsWith(normalizedBase + path.sep) && resolved !== normalizedBase) {
+  if (
+    !resolved.startsWith(normalizedBase + path.sep) &&
+    resolved !== normalizedBase
+  ) {
     throw new Error(`Image path escapes base directory: ${src}`);
   }
 

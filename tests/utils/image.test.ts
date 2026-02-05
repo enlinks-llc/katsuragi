@@ -1,11 +1,8 @@
-import { describe, expect, test, beforeAll, afterAll } from 'vitest';
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import * as os from 'node:os';
-import {
-  resolveImagePath,
-  loadImageAsDataUri,
-} from '../../src/utils/image.js';
+import * as path from 'node:path';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { loadImageAsDataUri, resolveImagePath } from '../../src/utils/image.js';
 
 describe('image utilities', () => {
   let tmpDir: string;
@@ -16,15 +13,73 @@ describe('image utilities', () => {
 
     // Create a minimal valid PNG file (1x1 transparent pixel)
     const pngBuffer = Buffer.from([
-      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, // PNG signature
-      0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR chunk
-      0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-      0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4,
-      0x89, 0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41, // IDAT chunk
-      0x54, 0x78, 0x9c, 0x63, 0x00, 0x01, 0x00, 0x00,
-      0x05, 0x00, 0x01, 0x0d, 0x0a, 0x2d, 0xb4, 0x00, // CRC
-      0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, // IEND chunk
-      0x42, 0x60, 0x82,
+      0x89,
+      0x50,
+      0x4e,
+      0x47,
+      0x0d,
+      0x0a,
+      0x1a,
+      0x0a, // PNG signature
+      0x00,
+      0x00,
+      0x00,
+      0x0d,
+      0x49,
+      0x48,
+      0x44,
+      0x52, // IHDR chunk
+      0x00,
+      0x00,
+      0x00,
+      0x01,
+      0x00,
+      0x00,
+      0x00,
+      0x01,
+      0x08,
+      0x06,
+      0x00,
+      0x00,
+      0x00,
+      0x1f,
+      0x15,
+      0xc4,
+      0x89,
+      0x00,
+      0x00,
+      0x00,
+      0x0a,
+      0x49,
+      0x44,
+      0x41, // IDAT chunk
+      0x54,
+      0x78,
+      0x9c,
+      0x63,
+      0x00,
+      0x01,
+      0x00,
+      0x00,
+      0x05,
+      0x00,
+      0x01,
+      0x0d,
+      0x0a,
+      0x2d,
+      0xb4,
+      0x00, // CRC
+      0x00,
+      0x00,
+      0x00,
+      0x49,
+      0x45,
+      0x4e,
+      0x44,
+      0xae, // IEND chunk
+      0x42,
+      0x60,
+      0x82,
     ]);
     testPngPath = path.join(tmpDir, 'test.png');
     fs.writeFileSync(testPngPath, pngBuffer);
@@ -55,7 +110,9 @@ describe('image utilities', () => {
     });
 
     test('throws on path traversal attack', () => {
-      expect(() => resolveImagePath('../../../etc/passwd', '/base/path')).toThrow(/escapes base directory/i);
+      expect(() =>
+        resolveImagePath('../../../etc/passwd', '/base/path'),
+      ).toThrow(/escapes base directory/i);
     });
 
     // Edge cases
@@ -70,7 +127,9 @@ describe('image utilities', () => {
     });
 
     test('throws on sneaky traversal with intermediate ..', () => {
-      expect(() => resolveImagePath('./foo/../../etc/passwd', '/base/path')).toThrow(/escapes base directory/i);
+      expect(() =>
+        resolveImagePath('./foo/../../etc/passwd', '/base/path'),
+      ).toThrow(/escapes base directory/i);
     });
 
     test('handles basePath with trailing slash', () => {
@@ -84,7 +143,9 @@ describe('image utilities', () => {
     });
 
     test('throws on single .. traversal', () => {
-      expect(() => resolveImagePath('..', '/base/path')).toThrow(/escapes base directory/i);
+      expect(() => resolveImagePath('..', '/base/path')).toThrow(
+        /escapes base directory/i,
+      );
     });
   });
 
@@ -101,7 +162,9 @@ describe('image utilities', () => {
     });
 
     test('throws on missing file', () => {
-      expect(() => loadImageAsDataUri('/nonexistent/image.png')).toThrow(/not found/i);
+      expect(() => loadImageAsDataUri('/nonexistent/image.png')).toThrow(
+        /not found/i,
+      );
     });
   });
 });

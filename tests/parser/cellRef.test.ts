@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { parseCellRef, parseCellRange } from '../../src/parser/cellRef';
+import { describe, expect, it } from 'vitest';
+import { parseCellRange, parseCellRef } from '../../src/parser/cellRef';
 
 describe('parseCellRef', () => {
   it('parses A1 to {col: 0, row: 0}', () => {

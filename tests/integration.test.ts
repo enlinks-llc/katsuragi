@@ -1,9 +1,9 @@
-import { describe, expect, test } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { describe, expect, test } from 'vitest';
+import { convertToPng } from '../src/converter/index.js';
 import { parse } from '../src/parser/index.js';
 import { generateSvg } from '../src/svg/index.js';
-import { convertToPng } from '../src/converter/index.js';
 
 const examplesDir = path.join(__dirname, '..', 'examples');
 

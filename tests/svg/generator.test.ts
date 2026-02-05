@@ -346,7 +346,12 @@ describe('generateSvg', () => {
           {
             type: 'img',
             range: { start: { col: 0, row: 0 }, end: { col: 0, row: 0 } },
-            props: { src: '/logo.png', alt: 'Logo', bg: '#eee', border: '#999' },
+            props: {
+              src: '/logo.png',
+              alt: 'Logo',
+              bg: '#eee',
+              border: '#999',
+            },
           },
         ],
       };

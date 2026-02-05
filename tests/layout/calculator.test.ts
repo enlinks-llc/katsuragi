@@ -3,7 +3,7 @@ import {
   calculateCanvasSize,
   calculateCellRect,
 } from '../../src/layout/calculator.js';
-import type { CellRange, Metadata, LayoutConfig } from '../../src/types.js';
+import type { CellRange, LayoutConfig, Metadata } from '../../src/types.js';
 
 describe('calculateCanvasSize', () => {
   test('calculates 16:9 landscape (wider)', () => {

@@ -143,6 +143,45 @@ cat input.kui | ktr -o output.png
 | `-V, --version` | バージョン表示 |
 | `-h, --help` | ヘルプ表示 |
 
+### Fetchコマンド
+
+Webページを.kuiワイヤーフレームに変換：
+
+```bash
+# 基本的な使い方
+ktr fetch https://example.com -o wireframe.kui
+
+# ビューポート指定 (desktop, mobile, tablet)
+ktr fetch https://example.com -o mobile.kui --viewport mobile
+
+# グリッドとratioをオーバーライド
+ktr fetch https://example.com -o custom.kui --grid 6x4 --ratio 4:3
+```
+
+**Fetchオプション:**
+
+| オプション | 説明 |
+|------------|------|
+| `-o, --output <file>` | 出力.kuiファイルパス（必須） |
+| `--viewport <type>` | ビューポート: `desktop`, `mobile`, `tablet`（デフォルト: `desktop`） |
+| `--grid <grid>` | グリッドサイズ上書き（例: `4x3`、最大 `26x26`） |
+| `--ratio <ratio>` | アスペクト比上書き（例: `16:9`） |
+
+**動作の仕組み:**
+
+1. URLからHTMLを取得（JavaScript実行なし）
+2. 視覚要素を抽出（header, form, button, input, img, textなど）
+3. ドキュメント構造からレイアウト位置を推定
+4. 要素を.kuiコンポーネントにマッピング
+5. 編集・レンダリング可能な.kuiファイルを出力
+
+**制限事項:**
+
+- 静的HTMLのみ対応（SPAは正しく動作しません）
+- CSS解析なし - レイアウトはドキュメント構造から推定
+- テキスト内容は抽出されません（要素の位置のみ）
+- 最大グリッドサイズ: 26×26
+
 ## なぜテキストベース？
 
 Katsuragiがテキスト形式なのは、**AIが読み書きできる**からです。
@@ -314,6 +353,7 @@ A1: { type: txt, value: `
 
 - [x] 基本コンポーネント（txt, box, btn, input, img）
 - [x] SVG/PNG出力
+- [x] Webページから.kui変換（`ktr fetch`）
 - [ ] Markdown埋め込み対応（` ```kui ` コードブロック）
 - [ ] HTML出力
 - [ ] VS Code拡張機能
@@ -338,6 +378,7 @@ A1: { type: txt, value: `
 | [sharp](https://sharp.pixelplumbing.com/) | Apache-2.0 | 高性能画像処理 |
 | [libvips](https://github.com/libvips/libvips) | LGPL-3.0-or-later | 画像処理ライブラリ（sharpの依存） |
 | [commander](https://github.com/tj/commander.js) | MIT | CLIパーサー |
+| [node-html-parser](https://github.com/nicolewhite/node-html-parser) | MIT | HTMLパーサー（fetchコマンド用） |
 
 ## 謝辞
 

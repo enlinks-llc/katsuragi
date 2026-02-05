@@ -143,6 +143,45 @@ cat input.kui | ktr -o output.png
 | `-V, --version` | Show version number |
 | `-h, --help` | Show help |
 
+### Fetch Command
+
+Convert webpages to .kui wireframes:
+
+```bash
+# Basic usage
+ktr fetch https://example.com -o wireframe.kui
+
+# Specify viewport (desktop, mobile, tablet)
+ktr fetch https://example.com -o mobile.kui --viewport mobile
+
+# Override grid and ratio
+ktr fetch https://example.com -o custom.kui --grid 6x4 --ratio 4:3
+```
+
+**Fetch Options:**
+
+| Option | Description |
+|--------|-------------|
+| `-o, --output <file>` | Output .kui file path (required) |
+| `--viewport <type>` | Target viewport: `desktop`, `mobile`, `tablet` (default: `desktop`) |
+| `--grid <grid>` | Override grid size (e.g., `4x3`, max `26x26`) |
+| `--ratio <ratio>` | Override aspect ratio (e.g., `16:9`) |
+
+**How it works:**
+
+1. Fetches HTML from the URL (no JavaScript execution)
+2. Extracts visual elements (headers, forms, buttons, inputs, images, text)
+3. Estimates layout positions based on document flow
+4. Maps elements to .kui components
+5. Outputs a .kui file you can edit and render
+
+**Limitations:**
+
+- Static HTML only (SPAs won't work properly)
+- No CSS analysis - layout is estimated from document structure
+- Text content is not extracted (only element positions)
+- Maximum grid size: 26×26
+
 ## Why Text-Based?
 
 Katsuragi uses a text format because **AI can read and write it**.
@@ -314,6 +353,7 @@ The longest edge is fixed at 1280px. The shorter edge is calculated from the rat
 
 - [x] Core components (txt, box, btn, input, img)
 - [x] SVG/PNG export
+- [x] Web page to .kui conversion (`ktr fetch`)
 - [ ] Markdown embedding (` ```kui ` code blocks)
 - [ ] HTML export
 - [ ] VS Code extension
@@ -338,6 +378,7 @@ This software uses the following open-source libraries:
 | [sharp](https://sharp.pixelplumbing.com/) | Apache-2.0 | High-performance image processing |
 | [libvips](https://github.com/libvips/libvips) | LGPL-3.0-or-later | Image processing library (sharp dependency) |
 | [commander](https://github.com/tj/commander.js) | MIT | CLI argument parsing |
+| [node-html-parser](https://github.com/nicolewhite/node-html-parser) | MIT | HTML parsing for fetch command |
 
 ## Acknowledgments
 

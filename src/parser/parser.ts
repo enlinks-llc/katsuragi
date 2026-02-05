@@ -1,17 +1,17 @@
 import type {
+  Align,
+  CellRange,
+  ColorTheme,
+  Component,
+  ComponentProps,
+  ComponentType,
   KuiDocument,
   Metadata,
-  Component,
-  ComponentType,
-  ComponentProps,
-  CellRange,
-  Align,
-  ColorTheme,
   SourceLocation,
 } from '../types.js';
-import { TokenType, tokenize, type Token } from './lexer.js';
 import { parseCellRange } from './cellRef.js';
 import { KuiSyntaxError } from './errors.js';
+import { type Token, TokenType, tokenize } from './lexer.js';
 
 const VALID_COMPONENT_TYPES = new Set<ComponentType>([
   'txt',
@@ -38,7 +38,7 @@ function validateRangeWithinGrid(
   grid: [number, number],
   rangeStr: string,
   loc: SourceLocation,
-  source: string
+  source: string,
 ): void {
   const [cols, rows] = grid;
 
@@ -48,7 +48,7 @@ function validateRangeWithinGrid(
     throw new KuiSyntaxError(
       `Cell "${rangeStr}" exceeds column bounds. Grid is ${cols}x${rows}, valid columns: A-${maxCol}`,
       loc,
-      source
+      source,
     );
   }
 
@@ -57,7 +57,7 @@ function validateRangeWithinGrid(
     throw new KuiSyntaxError(
       `Cell "${rangeStr}" exceeds row bounds. Grid is ${cols}x${rows}, valid rows: 1-${rows}`,
       loc,
-      source
+      source,
     );
   }
 }
@@ -75,7 +75,13 @@ export function parse(input: string): KuiDocument {
   const defaultLoc: SourceLocation = { line: 1, column: 1, offset: 0 };
 
   function peek(offset = 0): Token {
-    return tokens[pos + offset] ?? { type: TokenType.EOF, value: '', loc: defaultLoc };
+    return (
+      tokens[pos + offset] ?? {
+        type: TokenType.EOF,
+        value: '',
+        loc: defaultLoc,
+      }
+    );
   }
 
   function advance(): Token {
@@ -137,7 +143,10 @@ export function parse(input: string): KuiDocument {
       } else if (nextToken.type === TokenType.THEME_REF) {
         value = advance().value;
       } else {
-        throw syntaxError(`Unexpected token ${nextToken.type} for property value`, nextToken.loc);
+        throw syntaxError(
+          `Unexpected token ${nextToken.type} for property value`,
+          nextToken.loc,
+        );
       }
 
       props[key] = value;
@@ -178,7 +187,10 @@ export function parse(input: string): KuiDocument {
         // CSS color names like "orange", "lightblue"
         value = advance().value;
       } else {
-        throw syntaxError(`Expected color value, got ${valueToken.type}`, valueToken.loc);
+        throw syntaxError(
+          `Expected color value, got ${valueToken.type}`,
+          valueToken.loc,
+        );
       }
 
       colors[key] = value;
@@ -198,7 +210,7 @@ export function parse(input: string): KuiDocument {
   function resolveColor(
     value: string | undefined,
     colors: ColorTheme | undefined,
-    loc: SourceLocation
+    loc: SourceLocation,
   ): string | undefined {
     if (!value) return undefined;
     if (value.startsWith('$')) {
@@ -226,7 +238,10 @@ export function parse(input: string): KuiDocument {
 
     const componentType = rawProps.type as ComponentType;
     if (!VALID_COMPONENT_TYPES.has(componentType)) {
-      throw syntaxError(`Invalid component type: ${componentType}`, cellToken.loc);
+      throw syntaxError(
+        `Invalid component type: ${componentType}`,
+        cellToken.loc,
+      );
     }
 
     // Apply defaults
@@ -242,14 +257,18 @@ export function parse(input: string): KuiDocument {
       if (rangesOverlap(existing.range, range)) {
         throw syntaxError(
           `Cell overlap detected: ${rangeStr} overlaps with existing component`,
-          cellToken.loc
+          cellToken.loc,
         );
       }
     }
 
     // Resolve color references
     const bg = resolveColor(rawProps.bg, metadata.colors, cellToken.loc);
-    const border = resolveColor(rawProps.border, metadata.colors, cellToken.loc);
+    const border = resolveColor(
+      rawProps.border,
+      metadata.colors,
+      cellToken.loc,
+    );
 
     // Build props without 'type'
     const props: ComponentProps = {
@@ -304,10 +323,19 @@ export function parse(input: string): KuiDocument {
     }
 
     // Component: cell reference or range
-    if (token.type === TokenType.CELL_REF || token.type === TokenType.CELL_RANGE) {
+    if (
+      token.type === TokenType.CELL_REF ||
+      token.type === TokenType.CELL_RANGE
+    ) {
       advance();
       const component = parseComponent(token);
-      validateRangeWithinGrid(component.range, metadata.grid, token.value, token.loc, input);
+      validateRangeWithinGrid(
+        component.range,
+        metadata.grid,
+        token.value,
+        token.loc,
+        input,
+      );
       components.push(component);
       continue;
     }

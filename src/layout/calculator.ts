@@ -1,4 +1,9 @@
-import type { CellRange, CanvasSize, LayoutRect, LayoutConfig } from '../types.js';
+import type {
+  CanvasSize,
+  CellRange,
+  LayoutConfig,
+  LayoutRect,
+} from '../types.js';
 
 const LONGEST_EDGE = 1280;
 const DEFAULT_PADDING = 16;
@@ -25,7 +30,7 @@ export function calculateCellRect(
   grid: [number, number],
   canvas: CanvasSize,
   config: LayoutConfig = { gap: 0, padding: DEFAULT_PADDING },
-  cellPadding?: number
+  cellPadding?: number,
 ): LayoutRect {
   const [cols, rows] = grid;
   const { gap } = config;

@@ -1,8 +1,8 @@
-import { describe, expect, test, beforeAll, afterAll } from 'vitest';
 import { execSync } from 'node:child_process';
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import * as os from 'node:os';
+import * as path from 'node:path';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 describe('CLI', () => {
   let tmpDir: string;
@@ -18,7 +18,7 @@ describe('CLI', () => {
 grid: 4x3
 
 A1..D1: { type: txt, value: "Test", align: center }
-`
+`,
     );
   });
 
@@ -100,8 +100,14 @@ A1..D1: { type: txt, value: "Test", align: center }
       expect(fs.existsSync(path.join(tmpDir, 'batch1.svg'))).toBe(true);
       expect(fs.existsSync(path.join(tmpDir, 'batch2.svg'))).toBe(true);
 
-      const content1 = fs.readFileSync(path.join(tmpDir, 'batch1.svg'), 'utf-8');
-      const content2 = fs.readFileSync(path.join(tmpDir, 'batch2.svg'), 'utf-8');
+      const content1 = fs.readFileSync(
+        path.join(tmpDir, 'batch1.svg'),
+        'utf-8',
+      );
+      const content2 = fs.readFileSync(
+        path.join(tmpDir, 'batch2.svg'),
+        'utf-8',
+      );
       expect(content1).toContain('One');
       expect(content2).toContain('Two');
     });
@@ -161,10 +167,13 @@ A1..D1: { type: txt, value: "Test", align: center }
 
   describe('stdin support', () => {
     test('reads from stdin when no file provided', () => {
-      const result = execSync(`printf 'ratio: 16:9\ngrid: 2x2\nA1: { type: txt, value: "FromStdin" }' | npx tsx src/cli.ts`, {
-        encoding: 'utf-8',
-        shell: '/bin/bash',
-      });
+      const result = execSync(
+        `printf 'ratio: 16:9\ngrid: 2x2\nA1: { type: txt, value: "FromStdin" }' | npx tsx src/cli.ts`,
+        {
+          encoding: 'utf-8',
+          shell: '/bin/bash',
+        },
+      );
 
       expect(result).toContain('<svg');
       expect(result).toContain('FromStdin');
@@ -172,10 +181,13 @@ A1..D1: { type: txt, value: "Test", align: center }
 
     test('outputs to file when using stdin with -o', () => {
       const outFile = path.join(tmpDir, 'stdin-output.svg');
-      execSync(`printf 'ratio: 16:9\ngrid: 2x2\nA1: { type: txt, value: "StdinFile" }' | npx tsx src/cli.ts -o ${outFile}`, {
-        encoding: 'utf-8',
-        shell: '/bin/bash',
-      });
+      execSync(
+        `printf 'ratio: 16:9\ngrid: 2x2\nA1: { type: txt, value: "StdinFile" }' | npx tsx src/cli.ts -o ${outFile}`,
+        {
+          encoding: 'utf-8',
+          shell: '/bin/bash',
+        },
+      );
 
       const content = fs.readFileSync(outFile, 'utf-8');
       expect(content).toContain('<svg');
@@ -184,10 +196,13 @@ A1..D1: { type: txt, value: "Test", align: center }
 
     test('outputs PNG when using stdin with -o .png', () => {
       const outFile = path.join(tmpDir, 'stdin-output.png');
-      execSync(`printf 'ratio: 16:9\ngrid: 2x2\nA1: { type: box }' | npx tsx src/cli.ts -o ${outFile}`, {
-        encoding: 'utf-8',
-        shell: '/bin/bash',
-      });
+      execSync(
+        `printf 'ratio: 16:9\ngrid: 2x2\nA1: { type: box }' | npx tsx src/cli.ts -o ${outFile}`,
+        {
+          encoding: 'utf-8',
+          shell: '/bin/bash',
+        },
+      );
 
       const buffer = fs.readFileSync(outFile);
       // PNG magic bytes
