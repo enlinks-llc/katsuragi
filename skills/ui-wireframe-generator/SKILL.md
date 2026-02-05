@@ -36,6 +36,7 @@ npx ktr input.kui -o output.png
 - **Quick prototyping**: Sketch screen layouts before writing any frontend code
 - **Documentation**: Embed wireframes in technical specs and PRs
 - **Design discussions**: Iterate on layouts through text diffs
+- **Reverse engineering**: Convert existing webpages to `.kui` wireframes with `ktr fetch`
 
 ## When to Use
 
@@ -52,6 +53,50 @@ To generate a wireframe:
 npx ktr input.kui -o output.png  # PNG output
 npx ktr input.kui -o output.svg  # SVG output
 ```
+
+## Fetch Command
+
+Convert existing webpages to `.kui` wireframes:
+
+```bash
+# Basic usage
+npx ktr fetch https://example.com -o output.kui
+
+# With viewport option (desktop, mobile, tablet)
+npx ktr fetch https://example.com -o output.kui --viewport mobile
+
+# With custom grid and ratio
+npx ktr fetch https://example.com -o output.kui --grid 6x4 --ratio 4:3
+```
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-o, --output <file>` | Output .kui file path (required) | - |
+| `--viewport <type>` | Target viewport: desktop, mobile, tablet | desktop |
+| `--grid <grid>` | Override grid size (e.g., 4x3) | auto |
+| `--ratio <ratio>` | Override aspect ratio (e.g., 16:9) | auto |
+
+### How It Works
+
+1. Fetches HTML from the URL (no headless browser)
+2. Parses DOM to extract visual elements (header, nav, main, footer, buttons, inputs, etc.)
+3. Auto-calculates optimal grid size based on element positions
+4. Maps HTML elements to kui components:
+   - `header`, `nav`, `main`, `footer`, `div`, `section` → `box`
+   - `button` → `btn`
+   - `input`, `textarea`, `select` → `input`
+   - `img` → `img`
+   - `h1`-`h6`, `p`, `span`, `label` (with text) → `txt`
+5. Generates `.kui` file with cell assignments
+
+### Limitations
+
+- No CSS parsing (structure-based analysis only)
+- No JavaScript execution (SPA not supported)
+- Maximum grid size: 26×26
+- Text content not extracted (positions only)
 
 ## File Structure
 
