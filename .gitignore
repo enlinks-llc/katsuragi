@@ -88,6 +88,9 @@ CLAUDE.md
 .cody/
 .sourcegraph/
 
+# Serena
+.serena/
+
 # JetBrains AI
 .junie/
 
