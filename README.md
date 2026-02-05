@@ -5,13 +5,38 @@
 [![npm version](https://badge.fury.io/js/katsuragi.svg)](https://www.npmjs.com/package/katsuragi)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
-## Turn text into wireframes. Let AI do the drawing.
+## Half the tokens. Twice the clarity.
+
+Turn UI ideas into wireframes with a text format AI actually understands.
 
 ### Who is this for?
 
 - Developers discussing UI with non-technical stakeholders
-- Full-stack engineers collaborating with AI on interface design
-- Anyone who wants to sketch UI without opening a design tool
+- Engineers using AI coding assistants (Claude Code, Cursor, Aider)
+- Teams who want git-diffable UI specs
+
+### Why .kui?
+
+```mermaid
+xychart-beta
+    title "Tokens per wireframe (login example)"
+    x-axis ["Natural Lang", "ASCII", ".kui", "HTML"]
+    y-axis "Tokens" 0 --> 400
+    bar [102, 84, 120, 330]
+```
+
+.kui hits the sweet spot between efficiency and reliability:
+
+| Format | Tokens | Precise | Editable |
+|--------|--------|---------|----------|
+| Natural Language | 102 | ❌ | ❌ |
+| ASCII Art | 84 | ⚠️ | ❌ |
+| **.kui** | **120** | **✓** | **✓** |
+| HTML | 330 | ✓ | ✓ |
+
+**50% fewer tokens than HTML**, with the same precision.
+
+[→ Full comparison with 3 patterns](./docs/analysis/README.md)
 
 ### How it works
 

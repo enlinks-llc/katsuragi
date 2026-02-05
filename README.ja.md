@@ -5,13 +5,38 @@
 [![npm version](https://badge.fury.io/js/katsuragi.svg)](https://www.npmjs.com/package/katsuragi)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
-## テキストからワイヤーフレームへ。描くのはAIに任せよう。
+## 半分のトークン。2倍の明確さ。
+
+AIが本当に理解できるテキスト形式で、UIアイデアをワイヤーフレームに。
 
 ### 誰のためのツール？
 
 - 非エンジニアのステークホルダーとUIを議論する開発者
-- AIと一緒にインターフェースを設計するフルスタックエンジニア
-- デザインツールを開かずにUIをスケッチしたい人
+- AIコーディングアシスタント（Claude Code, Cursor, Aider）を使うエンジニア
+- git diffで追跡できるUI仕様が欲しいチーム
+
+### なぜ .kui？
+
+```mermaid
+xychart-beta
+    title "ワイヤーフレームあたりのトークン数（login例）"
+    x-axis ["自然言語", "ASCII", ".kui", "HTML"]
+    y-axis "トークン" 0 --> 400
+    bar [102, 84, 120, 330]
+```
+
+.kuiは効率と信頼性の最適解:
+
+| 形式 | トークン | 正確 | 編集可能 |
+|------|----------|------|----------|
+| 自然言語 | 102 | ❌ | ❌ |
+| ASCIIアート | 84 | ⚠️ | ❌ |
+| **.kui** | **120** | **✓** | **✓** |
+| HTML | 330 | ✓ | ✓ |
+
+**HTMLの50%のトークン**で、同等の正確さ。
+
+[→ 3パターンでの詳細比較](./docs/analysis/README.ja.md)
 
 ### 使い方
 
