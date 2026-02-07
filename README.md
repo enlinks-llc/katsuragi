@@ -110,7 +110,7 @@ A2..B2: { type: btn, value: "Get Started" }
 EOF
 
 # Generate image
-katsuragi hello.kui -o hello.png
+npx ktr hello.kui -o hello.png
 ```
 
 ### Usage

@@ -110,7 +110,7 @@ A2..B2: { type: btn, value: "はじめる" }
 EOF
 
 # 画像生成
-katsuragi hello.kui -o hello.png
+npx ktr hello.kui -o hello.png
 ```
 
 ### 使い方
