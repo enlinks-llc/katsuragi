@@ -81,22 +81,25 @@ npx ktr fetch https://example.com -o output.kui --grid 6x4 --ratio 4:3
 ### How It Works
 
 1. Fetches HTML from the URL (no headless browser)
-2. Parses DOM to extract visual elements (header, nav, main, footer, buttons, inputs, etc.)
-3. Auto-calculates optimal grid size based on element positions
-4. Maps HTML elements to kui components:
-   - `header`, `nav`, `main`, `footer`, `div`, `section` → `box`
-   - `button` → `btn`
-   - `input`, `textarea`, `select` → `input`
-   - `img` → `img`
-   - `h1`-`h6`, `p`, `span`, `label` (with text) → `txt`
-5. Generates `.kui` file with cell assignments
+2. Extracts `<meta name="theme-color">` as the primary color for the `colors` header
+3. Extracts inline style colors (`background-color`, `border-color`) per element
+4. Parses DOM to extract visual elements (header, nav, main, footer, buttons, inputs, etc.)
+5. Auto-calculates optimal grid size based on element positions
+6. Maps HTML elements to kui components with real content:
+   - `header`, `nav`, `footer`, etc. → `txt` with semantic labels ("Header", "Navigation", "Footer")
+   - `button` → `btn` with actual button text
+   - `input`, `textarea`, `select` → `input` with placeholder or type-based label
+   - `img` → `img` with alt text
+   - `h1`-`h6`, `p`, `span`, `label` (with text) → `txt` with actual text content (truncated)
+7. Applies extracted colors to component `bg` and `border` properties
+8. Generates `.kui` file with cell assignments
 
 ### Limitations
 
 - No CSS parsing (structure-based analysis only)
 - No JavaScript execution (SPA not supported)
 - Maximum grid size: 26×26
-- Text content not extracted (positions only)
+- Text content is truncated for wireframe display (max 20-30 characters)
 
 ## File Structure
 
