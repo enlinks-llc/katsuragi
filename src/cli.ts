@@ -257,17 +257,17 @@ const fetchCommand = new Command('fetch')
 
       // Parse HTML to DOM elements
       const parseOptions = { maxElements, maxDepth };
-      const elements = parseHtmlToDom(result.html, result.viewport, parseOptions);
+      const parseResult = parseHtmlToDom(result.html, result.viewport, parseOptions);
 
-      if (elements.length === 0) {
+      if (parseResult.elements.length === 0) {
         console.error('Error: No visual elements found in HTML');
         process.exit(1);
       }
 
-      console.error(`Found ${elements.length} visual elements`);
+      console.error(`Found ${parseResult.elements.length} visual elements`);
 
       // Calculate grid layout
-      const gridResult = calculateGrid(elements, result.viewport, gridOverride);
+      const gridResult = calculateGrid(parseResult.elements, result.viewport, gridOverride);
 
       // Warn if grid was clamped
       if (gridResult.cols === 26 || gridResult.rows === 26) {
@@ -280,12 +280,17 @@ const fetchCommand = new Command('fetch')
       const components = mapAllToComponents(gridResult.placements);
 
       // Build KuiDocument
+      const colors = parseResult.themeColor
+        ? { primary: parseResult.themeColor }
+        : undefined;
+
       const doc: KuiDocument = {
         metadata: {
           ratio: ratio ?? result.viewport.defaultRatio,
           grid: [gridResult.cols, gridResult.rows],
           gap: 8,
           padding: 16,
+          colors,
         },
         components,
       };

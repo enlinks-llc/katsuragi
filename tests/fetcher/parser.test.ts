@@ -12,7 +12,7 @@ const desktopViewport: ViewportConfig = {
 describe('parseHtmlToDom', () => {
   it('extracts header element', () => {
     const html = '<html><body><header>Site Header</header></body></html>';
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(1);
     expect(elements[0].tagName).toBe('header');
@@ -28,7 +28,7 @@ describe('parseHtmlToDom', () => {
         <footer>Footer</footer>
       </body></html>
     `;
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(4);
     expect(elements.map((e) => e.tagName)).toEqual([
@@ -41,7 +41,7 @@ describe('parseHtmlToDom', () => {
 
   it('extracts button elements', () => {
     const html = '<html><body><button>Click me</button></body></html>';
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(1);
     expect(elements[0].tagName).toBe('button');
@@ -51,7 +51,7 @@ describe('parseHtmlToDom', () => {
   it('extracts input elements with placeholder', () => {
     const html =
       '<html><body><input placeholder="Enter email" type="email"></body></html>';
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(1);
     expect(elements[0].tagName).toBe('input');
@@ -66,7 +66,7 @@ describe('parseHtmlToDom', () => {
         <select><option>Option 1</option></select>
       </body></html>
     `;
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(2);
     expect(elements.map((e) => e.tagName)).toEqual(['textarea', 'select']);
@@ -74,7 +74,7 @@ describe('parseHtmlToDom', () => {
 
   it('extracts img elements with src and alt', () => {
     const html = '<html><body><img src="logo.png" alt="Logo"></body></html>';
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(1);
     expect(elements[0].tagName).toBe('img');
@@ -84,7 +84,7 @@ describe('parseHtmlToDom', () => {
 
   it('extracts heading elements with text', () => {
     const html = '<html><body><h1>Title</h1><h2>Subtitle</h2></body></html>';
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(2);
     expect(elements[0].tagName).toBe('h1');
@@ -95,7 +95,7 @@ describe('parseHtmlToDom', () => {
   it('skips heading elements without text', () => {
     const html =
       '<html><body><h1></h1><h2>   </h2><h3>Visible</h3></body></html>';
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(1);
     expect(elements[0].tagName).toBe('h3');
@@ -103,7 +103,7 @@ describe('parseHtmlToDom', () => {
 
   it('extracts paragraph elements with text', () => {
     const html = '<html><body><p>Some paragraph text here.</p></body></html>';
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(1);
     expect(elements[0].tagName).toBe('p');
@@ -123,7 +123,7 @@ describe('parseHtmlToDom', () => {
         </body>
       </html>
     `;
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(1);
     expect(elements[0].tagName).toBe('p');
@@ -138,7 +138,7 @@ describe('parseHtmlToDom', () => {
         </form>
       </body></html>
     `;
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(3);
     expect(elements.map((e) => e.tagName)).toEqual(['form', 'input', 'button']);
@@ -159,7 +159,7 @@ describe('parseHtmlToDom', () => {
         </main>
       </body></html>
     `;
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     // Should extract: header, nav, a, main, section, h1
     const tags = elements.map((e) => e.tagName);
@@ -174,7 +174,7 @@ describe('parseHtmlToDom', () => {
   it('truncates long text content', () => {
     const longText = 'A'.repeat(100);
     const html = `<html><body><p>${longText}</p></body></html>`;
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements[0].textContent).toBe(`${'A'.repeat(50)}...`);
   });
@@ -187,7 +187,7 @@ describe('parseHtmlToDom', () => {
         <button>Click</button>
       </body></html>
     `;
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     // Each element should have increasing Y position
     expect(elements[0].bounds.y).toBe(0);
@@ -197,14 +197,14 @@ describe('parseHtmlToDom', () => {
 
   it('returns empty array for empty body', () => {
     const html = '<html><body></body></html>';
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(0);
   });
 
   it('handles missing body tag', () => {
     const html = '<div><p>Text</p></div>';
-    const elements = parseHtmlToDom(html, desktopViewport);
+    const { elements } = parseHtmlToDom(html, desktopViewport);
 
     expect(elements).toHaveLength(1);
     expect(elements[0].tagName).toBe('p');

@@ -134,6 +134,7 @@ export type {
   DomElement,
   GridPlacement,
   GridResult,
+  ParseResult,
   ViewportConfig,
   ViewportType,
 } from './types.js';

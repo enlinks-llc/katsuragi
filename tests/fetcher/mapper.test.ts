@@ -29,36 +29,40 @@ function createPlacement(
 
 describe('mapToComponent', () => {
   describe('type mapping', () => {
-    it('maps header to box', () => {
+    it('maps header to txt with semantic label', () => {
       const placement = createPlacement('header', 0, 0, 4, 1);
       const component = mapToComponent(placement);
 
-      expect(component.type).toBe('box');
+      expect(component.type).toBe('txt');
+      expect(component.props.value).toBe('Header');
+      expect(component.props.align).toBe('center');
     });
 
-    it('maps nav to box', () => {
+    it('maps nav to txt with semantic label', () => {
       const placement = createPlacement('nav', 0, 0, 4, 1);
-      expect(mapToComponent(placement).type).toBe('box');
+      const component = mapToComponent(placement);
+      expect(component.type).toBe('txt');
+      expect(component.props.value).toBe('Navigation');
     });
 
-    it('maps main to box', () => {
+    it('maps main to txt with semantic label', () => {
       const placement = createPlacement('main', 0, 0, 4, 1);
-      expect(mapToComponent(placement).type).toBe('box');
+      expect(mapToComponent(placement).type).toBe('txt');
     });
 
-    it('maps footer to box', () => {
+    it('maps footer to txt with semantic label', () => {
       const placement = createPlacement('footer', 0, 0, 4, 1);
-      expect(mapToComponent(placement).type).toBe('box');
+      expect(mapToComponent(placement).type).toBe('txt');
     });
 
-    it('maps section to box', () => {
+    it('maps section to txt with semantic label', () => {
       const placement = createPlacement('section', 0, 0, 4, 1);
-      expect(mapToComponent(placement).type).toBe('box');
+      expect(mapToComponent(placement).type).toBe('txt');
     });
 
-    it('maps form to box', () => {
+    it('maps form to txt with semantic label', () => {
       const placement = createPlacement('form', 0, 0, 4, 1);
-      expect(mapToComponent(placement).type).toBe('box');
+      expect(mapToComponent(placement).type).toBe('txt');
     });
 
     it('maps button to btn', () => {
@@ -138,40 +142,85 @@ describe('mapToComponent', () => {
   });
 
   describe('properties', () => {
-    it('adds dummy label for input', () => {
+    it('uses placeholder for input label', () => {
       const placement = createPlacement('input', 0, 0, 2, 1, {
         placeholder: 'Enter email',
       });
       const component = mapToComponent(placement);
 
-      expect(component.props.label).toBe('[input]');
+      expect(component.props.label).toBe('Enter email');
     });
 
-    it('adds dummy alt for img', () => {
+    it('uses type for input label when no placeholder', () => {
+      const placement = createPlacement('input', 0, 0, 2, 1, {
+        type: 'email',
+      });
+      const component = mapToComponent(placement);
+
+      expect(component.props.label).toBe('Email');
+    });
+
+    it('falls back to Input for input without attributes', () => {
+      const placement = createPlacement('input', 0, 0, 2, 1);
+      const component = mapToComponent(placement);
+
+      expect(component.props.label).toBe('Input');
+    });
+
+    it('uses alt attribute for img', () => {
       const placement = createPlacement('img', 0, 0, 2, 2, {
         src: 'logo.png',
         alt: 'Company Logo',
       });
       const component = mapToComponent(placement);
 
-      expect(component.props.src).toBeUndefined();
-      expect(component.props.alt).toBe('[image]');
+      expect(component.props.alt).toBe('Company Logo');
     });
 
-    it('adds dummy value for txt', () => {
+    it('falls back to Image for img without alt', () => {
+      const placement = createPlacement('img', 0, 0, 2, 2);
+      const component = mapToComponent(placement);
+
+      expect(component.props.alt).toBe('Image');
+    });
+
+    it('uses textContent for txt', () => {
       const placement = createPlacement('h1', 0, 0, 4, 1);
       placement.element.textContent = 'Title';
       const component = mapToComponent(placement);
 
-      expect(component.props.value).toBe('[text]');
+      expect(component.props.value).toBe('Title');
     });
 
-    it('adds dummy value for btn', () => {
+    it('falls back to tag name for txt without text', () => {
+      const placement = createPlacement('h1', 0, 0, 4, 1);
+      const component = mapToComponent(placement);
+
+      expect(component.props.value).toBe('H1');
+    });
+
+    it('uses textContent for btn', () => {
       const placement = createPlacement('button', 0, 0, 1, 1);
       placement.element.textContent = 'Submit';
       const component = mapToComponent(placement);
 
-      expect(component.props.value).toBe('[button]');
+      expect(component.props.value).toBe('Submit');
+    });
+
+    it('falls back to Button for btn without text', () => {
+      const placement = createPlacement('button', 0, 0, 1, 1);
+      const component = mapToComponent(placement);
+
+      expect(component.props.value).toBe('Button');
+    });
+
+    it('applies inline style colors', () => {
+      const placement = createPlacement('button', 0, 0, 1, 1);
+      placement.element.colors = { bg: '#3B82F6', border: '#1E40AF' };
+      const component = mapToComponent(placement);
+
+      expect(component.props.bg).toBe('#3B82F6');
+      expect(component.props.border).toBe('#1E40AF');
     });
   });
 });
@@ -187,11 +236,11 @@ describe('mapAllToComponents', () => {
     const components = mapAllToComponents(placements);
 
     expect(components).toHaveLength(3);
-    expect(components[0].type).toBe('box');
+    expect(components[0].type).toBe('txt'); // header promoted to txt
     expect(components[1].type).toBe('input');
-    expect(components[1].props.label).toBe('[input]');
+    expect(components[1].props.label).toBe('Email'); // placeholder used
     expect(components[2].type).toBe('btn');
-    expect(components[2].props.value).toBe('[button]');
+    expect(components[2].props.value).toBe('Button'); // fallback
   });
 
   it('returns empty array for empty input', () => {

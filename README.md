@@ -176,15 +176,17 @@ ktr fetch https://example.com -o simple.kui --max-elements 30 --max-depth 3
 
 1. Fetches HTML from the URL (no JavaScript execution)
 2. Extracts visual elements with priority-based filtering (header/nav/main prioritized)
-3. Estimates layout positions based on document flow
-4. Uses intelligent grid placement with overlap resolution
-5. Outputs a .kui file with dummy placeholders (no external content)
+3. Extracts `<meta name="theme-color">` as the primary color
+4. Extracts inline style colors (`background-color`, `border-color`)
+5. Maps real text content (headings, button labels, placeholders) into components
+6. Estimates layout positions based on document flow
+7. Uses intelligent grid placement with overlap resolution
 
 **Limitations:**
 
 - Static HTML only (SPAs with client-side rendering won't work properly)
 - No CSS analysis - layout is estimated from document structure
-- Content is replaced with dummy placeholders for privacy
+- Text content is truncated for wireframe display (max 20-30 characters)
 - Maximum grid size: 26×26
 
 ## Why Text-Based?

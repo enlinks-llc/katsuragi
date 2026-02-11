@@ -1,5 +1,10 @@
 import { HTMLElement, parse as parseHtml } from 'node-html-parser';
-import type { DomElement, ViewportConfig, ParseOptions } from './types.js';
+import type {
+  DomElement,
+  ParseResult,
+  ViewportConfig,
+  ParseOptions,
+} from './types.js';
 
 /** Element priority levels (higher = more important) */
 const ELEMENT_PRIORITY: Record<string, number> = {
@@ -108,6 +113,26 @@ interface LayoutState {
 }
 
 /**
+ * Extract colors from inline style attribute
+ */
+function extractColorsFromStyle(
+  style: string,
+): { bg?: string; border?: string } | undefined {
+  const bgMatch = style.match(
+    /background(?:-color)?\s*:\s*([^;]+)/i,
+  );
+  const borderMatch = style.match(
+    /border(?:-color)?\s*:\s*([^;]+)/i,
+  );
+
+  const bg = bgMatch?.[1]?.trim();
+  const border = borderMatch?.[1]?.trim();
+
+  if (!bg && !border) return undefined;
+  return { bg: bg || undefined, border: border || undefined };
+}
+
+/**
  * Extract text content from an element (first 50 chars)
  */
 function extractText(element: HTMLElement): string | undefined {
@@ -207,6 +232,8 @@ function processElement(
   if (isVisual) {
     const priority = ELEMENT_PRIORITY[tagName] ?? 0;
 
+    const style = element.getAttribute('style') ?? '';
+
     const domElement: DomElement = {
       tagName,
       bounds: estimateBounds(element, tagName, state),
@@ -218,6 +245,7 @@ function processElement(
         src: element.getAttribute('src') ?? undefined,
         type: element.getAttribute('type') ?? undefined,
       },
+      colors: extractColorsFromStyle(style),
       priority,
       depth,
     };
@@ -242,13 +270,19 @@ export function parseHtmlToDom(
   html: string,
   viewport: ViewportConfig,
   options?: ParseOptions,
-): DomElement[] {
+): ParseResult {
   const opts = { ...DEFAULT_OPTIONS, ...options };
 
   const root = parseHtml(html, {
     lowerCaseTagName: true,
     comment: false,
   });
+
+  // Extract meta theme-color
+  const themeColor =
+    root
+      .querySelector('meta[name="theme-color"]')
+      ?.getAttribute('content') ?? undefined;
 
   const state: LayoutState = {
     currentY: 0,
@@ -274,5 +308,5 @@ export function parseHtmlToDom(
   // Re-sort by Y position for layout
   sorted.sort((a, b) => a.bounds.y - b.bounds.y);
 
-  return sorted;
+  return { elements: sorted, themeColor };
 }

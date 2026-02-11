@@ -27,6 +27,11 @@ export interface DomElement {
     src?: string;
     type?: string;
   };
+  /** Extracted colors from inline style */
+  colors?: {
+    bg?: string;
+    border?: string;
+  };
   /** Priority for placement (higher = more important) */
   priority?: number;
   /** Nesting depth in DOM tree */
@@ -56,6 +61,12 @@ export interface GridPlacement {
   row: number;
   colSpan: number;
   rowSpan: number;
+}
+
+/** Result of HTML parsing */
+export interface ParseResult {
+  elements: DomElement[];
+  themeColor?: string;
 }
 
 /** Grid calculation result */
