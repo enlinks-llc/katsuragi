@@ -1,13 +1,13 @@
 {
   "name": "katsuragi",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Text-based UI wireframe generator",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "katsuragi": "./dist/cli.js",
-    "ktr": "./dist/cli.js"
+    "katsuragi": "dist/cli.js",
+    "ktr": "dist/cli.js"
   },
   "files": [
     "dist",
