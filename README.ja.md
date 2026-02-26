@@ -139,9 +139,31 @@ cat input.kui | ktr -o output.png
 |------------|------|
 | `-o, --output <file>` | 出力ファイル（デフォルト: SVGは標準出力） |
 | `-d, --output-dir <dir>` | 一括変換時の出力ディレクトリ |
-| `-f, --format <format>` | 出力フォーマット: `svg` または `png`（デフォルト: `svg`） |
+| `-f, --format <format>` | 出力フォーマット: `svg`, `png`, `html`（デフォルト: `svg`） |
 | `-V, --version` | バージョン表示 |
 | `-h, --help` | ヘルプ表示 |
+
+### Watchコマンド
+
+ファイル保存時にブラウザで自動プレビュー：
+
+```bash
+# .kuiファイルの監視を開始
+ktr watch input.kui
+
+# ポート指定
+ktr watch input.kui -p 8080
+
+# ブラウザ自動起動を無効化
+ktr watch input.kui --no-open
+```
+
+**Watchオプション:**
+
+| オプション | 説明 |
+|------------|------|
+| `-p, --port <number>` | サーバーポート（デフォルト: `3456`） |
+| `--no-open` | ブラウザの自動起動を抑制 |
 
 ### Fetchコマンド
 
@@ -256,6 +278,27 @@ D3: { type: btn, value: "送信", bg: $primary }
 - セル参照はExcel形式: `A1`, `B2`, `C3`
 - 範囲指定: `A1..B3`（左上から右下）
 
+### 不等分割グリッド
+
+`col-widths` と `row-heights` で比率ベースのサイズ指定：
+
+```kui
+ratio: 16:9
+grid: 3x3
+col-widths: [1, 3, 1]
+row-heights: [1, 4, 1]
+gap: 8
+
+// サイドバーレイアウト
+A1..C1: { type: txt, value: "ヘッダー", align: center, bg: "#3B82F6" }
+A2: { type: txt, value: "メニュー", bg: "#f0f0f0" }
+B2: { type: box, bg: "#ffffff", border: "#ccc" }
+C2: { type: txt, value: "情報", bg: "#f0f0f0" }
+A3..C3: { type: txt, value: "フッター", align: center, bg: "#e0e0e0" }
+```
+
+値はピクセルではなく比率です。`[1, 3, 1]` は中央の列が両端の3倍の幅になります。省略時は従来通り等分割（後方互換）。
+
 ### 間隔とパディング
 
 ```kui
@@ -316,6 +359,22 @@ B2: { type: box, bg: lightblue }
 - CSS色名: `red`, `blue`, `lightblue`, `orange` など
 - テーマ参照: `$name`（`colors:` での定義が必要）
 
+### テーマ
+
+組み込みビジュアルプリセット：
+
+```kui
+theme: clean
+```
+
+| テーマ | 線幅 | 角丸 | フォントサイズ | デフォルト背景 |
+|--------|------|------|----------------|----------------|
+| `default` | 2px | 8px | 24px | `#e0e0e0` |
+| `clean` | 1px | 4px | 20px | `#f0f0f0` |
+| `bold` | 3px | 12px | 28px | `#d0d0d0` |
+
+コンポーネント個別の `bg` や `border` 指定はテーマより常に優先されます。
+
 ### 配置
 
 - `align`: `left`（デフォルト）, `center`, `right`
@@ -359,8 +418,11 @@ A1: { type: txt, value: `
 - [x] 基本コンポーネント（txt, box, btn, input, img）
 - [x] SVG/PNG出力
 - [x] Webページから.kui変換（`ktr fetch`）
+- [x] ライブプレビュー（`ktr watch`）
+- [x] 不等分割グリッド（`col-widths`, `row-heights`）
+- [x] 組み込みテーマ（default, clean, bold）
+- [x] HTML出力（CSS Gridレイアウト）
 - [ ] Markdown埋め込み対応（` ```kui ` コードブロック）
-- [ ] HTML出力
 - [ ] VS Code拡張機能
 - [ ] Webエディタ
 
@@ -384,6 +446,8 @@ A1: { type: txt, value: `
 | [libvips](https://github.com/libvips/libvips) | LGPL-3.0-or-later | 画像処理ライブラリ（sharpの依存） |
 | [commander](https://github.com/tj/commander.js) | MIT | CLIパーサー |
 | [node-html-parser](https://github.com/nicolewhite/node-html-parser) | MIT | HTMLパーサー（fetchコマンド用） |
+| [ws](https://github.com/websockets/ws) | MIT | WebSocketサーバー（watchモード用） |
+| [open](https://github.com/sindresorhus/open) | MIT | ブラウザ起動（watchモード用） |
 
 ## 謝辞
 

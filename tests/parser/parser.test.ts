@@ -292,4 +292,76 @@ A1: { type: box, border: $accent }`;
       expect(doc.metadata.padding).toBeUndefined();
     });
   });
+
+  describe('col-widths and row-heights', () => {
+    test('parses col-widths', () => {
+      const input = `grid: 3x2
+col-widths: [1, 2, 1]
+A1: { type: box }`;
+      const doc = parse(input);
+      expect(doc.metadata.colWidths).toEqual([1, 2, 1]);
+    });
+
+    test('parses row-heights', () => {
+      const input = `grid: 3x2
+row-heights: [1, 3]
+A1: { type: box }`;
+      const doc = parse(input);
+      expect(doc.metadata.rowHeights).toEqual([1, 3]);
+    });
+
+    test('parses both col-widths and row-heights', () => {
+      const input = `grid: 3x2
+col-widths: [1, 2, 1]
+row-heights: [1, 3]
+A1: { type: box }`;
+      const doc = parse(input);
+      expect(doc.metadata.colWidths).toEqual([1, 2, 1]);
+      expect(doc.metadata.rowHeights).toEqual([1, 3]);
+    });
+
+    test('parses decimal values', () => {
+      const input = `grid: 2x1
+col-widths: [1.5, 0.5]
+A1: { type: box }`;
+      const doc = parse(input);
+      expect(doc.metadata.colWidths).toEqual([1.5, 0.5]);
+    });
+
+    test('errors on col-widths count mismatch', () => {
+      const input = `grid: 4x3
+col-widths: [1, 2, 1]
+A1: { type: box }`;
+      expect(() => parse(input)).toThrow('col-widths has 3 elements but grid specifies 4 columns');
+    });
+
+    test('errors on row-heights count mismatch', () => {
+      const input = `grid: 3x2
+row-heights: [1, 2, 3]
+A1: { type: box }`;
+      expect(() => parse(input)).toThrow('row-heights has 3 elements but grid specifies 2 rows');
+    });
+
+    test('errors on zero value', () => {
+      const input = `grid: 3x2
+col-widths: [1, 0, 1]
+A1: { type: box }`;
+      expect(() => parse(input)).toThrow('Values must be positive numbers');
+    });
+
+    test('errors on empty array', () => {
+      const input = `grid: 3x2
+col-widths: []
+A1: { type: box }`;
+      expect(() => parse(input)).toThrow('Empty array is not allowed');
+    });
+
+    test('col-widths and row-heights are optional', () => {
+      const input = `grid: 3x2
+A1: { type: box }`;
+      const doc = parse(input);
+      expect(doc.metadata.colWidths).toBeUndefined();
+      expect(doc.metadata.rowHeights).toBeUndefined();
+    });
+  });
 });

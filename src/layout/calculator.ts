@@ -25,31 +25,72 @@ export function calculateCanvasSize(ratio: [number, number]): CanvasSize {
   };
 }
 
+/**
+ * Calculate individual cell sizes from ratio-based widths/heights.
+ * If ratios is undefined, returns equal sizes.
+ */
+export function calculateSizes(
+  totalSize: number,
+  count: number,
+  gap: number,
+  ratios?: number[],
+): number[] {
+  const totalGap = gap * (count - 1);
+  const available = totalSize - totalGap;
+
+  if (!ratios) {
+    const size = available / count;
+    return Array.from({ length: count }, () => size);
+  }
+
+  const totalRatio = ratios.reduce((a, b) => a + b, 0);
+  return ratios.map((r) => (available * r) / totalRatio);
+}
+
+export interface GridSizes {
+  colSizes: number[];
+  rowSizes: number[];
+}
+
 export function calculateCellRect(
   range: CellRange,
   grid: [number, number],
   canvas: CanvasSize,
   config: LayoutConfig = { gap: 0, padding: DEFAULT_PADDING },
   cellPadding?: number,
+  gridSizes?: GridSizes,
 ): LayoutRect {
   const [cols, rows] = grid;
   const { gap } = config;
 
-  // Calculate effective cell size accounting for gaps
-  const totalGapX = gap * (cols - 1);
-  const totalGapY = gap * (rows - 1);
-  const cellWidth = (canvas.width - totalGapX) / cols;
-  const cellHeight = (canvas.height - totalGapY) / rows;
+  const colSizes =
+    gridSizes?.colSizes ?? calculateSizes(canvas.width, cols, gap);
+  const rowSizes =
+    gridSizes?.rowSizes ?? calculateSizes(canvas.height, rows, gap);
 
-  // Calculate position including gaps
-  const x = range.start.col * (cellWidth + gap);
-  const y = range.start.row * (cellHeight + gap);
+  // Calculate position by summing preceding cell sizes + gaps
+  let x = 0;
+  for (let i = 0; i < range.start.col; i++) {
+    x += colSizes[i] + gap;
+  }
 
-  // Merged cell spans multiple gaps
-  const spanCols = range.end.col - range.start.col + 1;
-  const spanRows = range.end.row - range.start.row + 1;
-  const width = spanCols * cellWidth + (spanCols - 1) * gap;
-  const height = spanRows * cellHeight + (spanRows - 1) * gap;
+  let y = 0;
+  for (let i = 0; i < range.start.row; i++) {
+    y += rowSizes[i] + gap;
+  }
+
+  // Calculate span width/height
+  let width = 0;
+  for (let i = range.start.col; i <= range.end.col; i++) {
+    width += colSizes[i];
+    if (i < range.end.col) width += gap;
+  }
+
+  let height = 0;
+  for (let i = range.start.row; i <= range.end.row; i++) {
+    height += rowSizes[i];
+    if (i < range.end.row) height += gap;
+  }
 
   return {
     x,

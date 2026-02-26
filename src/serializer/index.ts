@@ -111,9 +111,21 @@ export function serialize(
   }
 
   // Metadata
-  const { ratio, grid, gap, padding, colors } = doc.metadata;
+  const { ratio, grid, gap, padding, colors, colWidths, rowHeights, theme } = doc.metadata;
   lines.push(`ratio: ${ratio[0]}:${ratio[1]}`);
   lines.push(`grid: ${grid[0]}x${grid[1]}`);
+
+  if (theme) {
+    lines.push(`theme: ${theme}`);
+  }
+
+  if (colWidths) {
+    lines.push(`col-widths: [${colWidths.join(', ')}]`);
+  }
+
+  if (rowHeights) {
+    lines.push(`row-heights: [${rowHeights.join(', ')}]`);
+  }
 
   if (gap !== undefined && gap > 0) {
     lines.push(`gap: ${gap}`);

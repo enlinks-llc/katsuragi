@@ -15,6 +15,7 @@ import {
 import { VERSION } from './index.js';
 import { parse } from './parser/index.js';
 import { serialize } from './serializer/index.js';
+import { generateHtml } from './html/index.js';
 import { generateSvg } from './svg/index.js';
 import type { KuiDocument } from './types.js';
 
@@ -31,12 +32,11 @@ async function readFromStdin(): Promise<string> {
 async function processFile(
   inputPath: string,
   outputDir: string | undefined,
-  format: 'svg' | 'png',
+  format: 'svg' | 'png' | 'html',
 ): Promise<void> {
   const kuiContent = fs.readFileSync(inputPath, 'utf-8');
   const doc = parse(kuiContent);
   const basePath = path.dirname(path.resolve(inputPath));
-  const svg = generateSvg(doc, basePath);
 
   const baseName = path.basename(inputPath, '.kui');
   const outputPath = path.join(
@@ -44,10 +44,15 @@ async function processFile(
     `${baseName}.${format}`,
   );
 
-  if (format === 'png') {
+  if (format === 'html') {
+    const html = generateHtml(doc);
+    fs.writeFileSync(outputPath, html, 'utf-8');
+  } else if (format === 'png') {
+    const svg = generateSvg(doc, basePath);
     const pngBuffer = await convertToPng(svg);
     fs.writeFileSync(outputPath, pngBuffer);
   } else {
+    const svg = generateSvg(doc, basePath);
     fs.writeFileSync(outputPath, svg, 'utf-8');
   }
 
@@ -76,9 +81,13 @@ program
     'Output file (single file mode, default: stdout)',
   )
   .option('-d, --output-dir <dir>', 'Output directory for batch conversion')
-  .option('-f, --format <format>', 'Output format: svg or png', 'svg')
+  .option('-f, --format <format>', 'Output format: svg, png, or html', 'svg')
   .action(async (inputs: string[], options: CliOptions) => {
-    const format = (options.format === 'png' ? 'png' : 'svg') as 'svg' | 'png';
+    const validFormats = ['svg', 'png', 'html'] as const;
+    type Format = (typeof validFormats)[number];
+    const format: Format = validFormats.includes(options.format as Format)
+      ? (options.format as Format)
+      : 'svg';
 
     // Stdin mode: no input files
     if (inputs.length === 0) {
@@ -90,19 +99,23 @@ program
 
       const kuiContent = await readFromStdin();
       const doc = parse(kuiContent);
-      // No basePath for stdin - image embedding will use placeholders
-      const svg = generateSvg(doc);
 
       if (options.output) {
         const ext = path.extname(options.output).toLowerCase();
-        if (ext === '.png') {
-          const pngBuffer = await convertToPng(svg);
+        if (ext === '.html') {
+          fs.writeFileSync(options.output, generateHtml(doc), 'utf-8');
+        } else if (ext === '.png') {
+          const pngBuffer = await convertToPng(generateSvg(doc));
           fs.writeFileSync(options.output, pngBuffer);
         } else {
-          fs.writeFileSync(options.output, svg, 'utf-8');
+          fs.writeFileSync(options.output, generateSvg(doc), 'utf-8');
         }
       } else {
-        process.stdout.write(svg);
+        if (format === 'html') {
+          process.stdout.write(generateHtml(doc));
+        } else {
+          process.stdout.write(generateSvg(doc));
+        }
       }
       return;
     }
@@ -118,24 +131,25 @@ program
       const kuiContent = fs.readFileSync(input, 'utf-8');
       const doc = parse(kuiContent);
       const basePath = path.dirname(path.resolve(input));
-      const svg = generateSvg(doc, basePath);
 
       const ext = path.extname(options.output).toLowerCase();
-      if (ext === '.png') {
-        const pngBuffer = await convertToPng(svg);
+      if (ext === '.html') {
+        fs.writeFileSync(options.output, generateHtml(doc), 'utf-8');
+      } else if (ext === '.png') {
+        const pngBuffer = await convertToPng(generateSvg(doc, basePath));
         fs.writeFileSync(options.output, pngBuffer);
       } else {
-        fs.writeFileSync(options.output, svg, 'utf-8');
+        fs.writeFileSync(options.output, generateSvg(doc, basePath), 'utf-8');
       }
       return;
     }
 
-    // Single file without -o, -d, or -f png: output to stdout
+    // Single file without -o or -d, and text format: output to stdout
     if (
       inputs.length === 1 &&
       !options.output &&
       !options.outputDir &&
-      format === 'svg'
+      (format === 'svg' || format === 'html')
     ) {
       const input = inputs[0];
       if (!fs.existsSync(input)) {
@@ -146,8 +160,11 @@ program
       const kuiContent = fs.readFileSync(input, 'utf-8');
       const doc = parse(kuiContent);
       const basePath = path.dirname(path.resolve(input));
-      const svg = generateSvg(doc, basePath);
-      process.stdout.write(svg);
+      if (format === 'html') {
+        process.stdout.write(generateHtml(doc));
+      } else {
+        process.stdout.write(generateSvg(doc, basePath));
+      }
       return;
     }
 
@@ -313,13 +330,35 @@ const fetchCommand = new Command('fetch')
     }
   });
 
-// Check if we should run fetch subcommand
-const shouldRunFetch = process.argv[2] === 'fetch';
+// Watch subcommand
+interface WatchOptions {
+  port: string;
+  open: boolean;
+  format: string;
+}
 
-if (shouldRunFetch) {
-  // Run fetch command with its own argument parsing
-  // Shift 'fetch' out and keep the rest
+const watchCommand = new Command('watch')
+  .description('Watch a .kui file and live preview in browser')
+  .argument('<input>', 'Input .kui file to watch')
+  .option('-p, --port <number>', 'Server port', '3456')
+  .option('--no-open', 'Do not open browser automatically')
+  .option('-f, --format <format>', 'Preview format', 'svg')
+  .action(async (input: string, options: WatchOptions) => {
+    const { watch: startWatch } = await import('./watcher/index.js');
+    await startWatch(input, {
+      port: parseInt(options.port, 10),
+      open: options.open,
+      format: options.format,
+    });
+  });
+
+// Check if we should run a subcommand
+const subcommand = process.argv[2];
+
+if (subcommand === 'fetch') {
   fetchCommand.parse(['node', 'fetch', ...process.argv.slice(3)]);
+} else if (subcommand === 'watch') {
+  watchCommand.parse(['node', 'watch', ...process.argv.slice(3)]);
 } else {
   // Run main program
   program.parse();

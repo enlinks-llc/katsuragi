@@ -1,1 +1,6 @@
-export { calculateCanvasSize, calculateCellRect } from './calculator.js';
+export {
+  calculateCanvasSize,
+  calculateCellRect,
+  calculateSizes,
+} from './calculator.js';
+export type { GridSizes } from './calculator.js';

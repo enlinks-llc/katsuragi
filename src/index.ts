@@ -8,5 +8,6 @@ export {
   TokenType,
   tokenize,
 } from './parser/index.js';
+export { generateHtml } from './html/index.js';
 export { generateSvg } from './svg/index.js';
 export * from './types.js';

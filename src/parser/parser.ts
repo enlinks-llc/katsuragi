@@ -223,6 +223,35 @@ export function parse(input: string): KuiDocument {
     return value;
   }
 
+  function parseNumberArray(loc: SourceLocation): number[] {
+    expect(TokenType.LBRACKET);
+    const values: number[] = [];
+
+    while (peek().type !== TokenType.RBRACKET) {
+      const numToken = expect(TokenType.NUMBER);
+      const value = parseFloat(numToken.value);
+      if (value <= 0 || Number.isNaN(value)) {
+        throw syntaxError(
+          `Invalid value in array: ${numToken.value}. Values must be positive numbers`,
+          numToken.loc,
+        );
+      }
+      values.push(value);
+
+      if (peek().type === TokenType.COMMA) {
+        advance();
+      }
+    }
+
+    expect(TokenType.RBRACKET);
+
+    if (values.length === 0) {
+      throw syntaxError('Empty array is not allowed', loc);
+    }
+
+    return values;
+  }
+
   function parseComponent(cellToken: Token): Component {
     const rangeStr = cellToken.value;
     const range = parseCellRange(rangeStr);
@@ -316,6 +345,13 @@ export function parse(input: string): KuiDocument {
         metadata.padding = parseInt(numToken.value, 10);
       } else if (name === 'colors') {
         metadata.colors = parseColors();
+      } else if (name === 'col-widths') {
+        metadata.colWidths = parseNumberArray(identToken.loc);
+      } else if (name === 'row-heights') {
+        metadata.rowHeights = parseNumberArray(identToken.loc);
+      } else if (name === 'theme') {
+        const themeToken = expect(TokenType.IDENTIFIER);
+        metadata.theme = themeToken.value;
       } else {
         throw syntaxError(`Unknown metadata: ${name}`, identToken.loc);
       }
@@ -342,6 +378,20 @@ export function parse(input: string): KuiDocument {
 
     // Skip unknown tokens
     advance();
+  }
+
+  // Validate col-widths and row-heights against grid dimensions
+  if (metadata.colWidths && metadata.colWidths.length !== metadata.grid[0]) {
+    throw syntaxError(
+      `col-widths has ${metadata.colWidths.length} elements but grid specifies ${metadata.grid[0]} columns`,
+      defaultLoc,
+    );
+  }
+  if (metadata.rowHeights && metadata.rowHeights.length !== metadata.grid[1]) {
+    throw syntaxError(
+      `row-heights has ${metadata.rowHeights.length} elements but grid specifies ${metadata.grid[1]} rows`,
+      defaultLoc,
+    );
   }
 
   return { metadata, components };

@@ -16,6 +16,8 @@ export const TokenType = {
   EOF: 'EOF',
   HEX_COLOR: 'HEX_COLOR',
   THEME_REF: 'THEME_REF',
+  LBRACKET: 'LBRACKET',
+  RBRACKET: 'RBRACKET',
 } as const;
 
 export type TokenType = (typeof TokenType)[keyof typeof TokenType];
@@ -130,7 +132,7 @@ export function tokenize(input: string): Token[] {
 
   function readWord(): string {
     let word = '';
-    while (pos < input.length && /[a-zA-Z0-9_]/.test(peek())) {
+    while (pos < input.length && /[a-zA-Z0-9_-]/.test(peek())) {
       word += advance();
     }
     return word;
@@ -156,7 +158,7 @@ export function tokenize(input: string): Token[] {
 
   function readNumberOrRatioOrGrid(): string {
     let value = '';
-    while (pos < input.length && /[0-9:x]/i.test(peek())) {
+    while (pos < input.length && /[0-9.:x]/i.test(peek())) {
       value += advance();
     }
     return value;
@@ -203,6 +205,16 @@ export function tokenize(input: string): Token[] {
     if (ch === ',') {
       advance();
       tokens.push({ type: TokenType.COMMA, value: ',', loc });
+      continue;
+    }
+    if (ch === '[') {
+      advance();
+      tokens.push({ type: TokenType.LBRACKET, value: '[', loc });
+      continue;
+    }
+    if (ch === ']') {
+      advance();
+      tokens.push({ type: TokenType.RBRACKET, value: ']', loc });
       continue;
     }
 

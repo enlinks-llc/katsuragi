@@ -44,6 +44,9 @@ export interface Metadata {
   gap?: number;
   padding?: number;
   colors?: ColorTheme;
+  colWidths?: number[];
+  rowHeights?: number[];
+  theme?: string;
 }
 
 export interface KuiDocument {

@@ -139,9 +139,31 @@ cat input.kui | ktr -o output.png
 |--------|-------------|
 | `-o, --output <file>` | Output file (default: stdout for SVG) |
 | `-d, --output-dir <dir>` | Output directory for batch conversion |
-| `-f, --format <format>` | Output format: `svg` or `png` (default: `svg`) |
+| `-f, --format <format>` | Output format: `svg`, `png`, or `html` (default: `svg`) |
 | `-V, --version` | Show version number |
 | `-h, --help` | Show help |
+
+### Watch Command
+
+Live preview in your browser with auto-reload on save:
+
+```bash
+# Start watching a .kui file
+ktr watch input.kui
+
+# Specify port
+ktr watch input.kui -p 8080
+
+# Disable auto browser open
+ktr watch input.kui --no-open
+```
+
+**Watch Options:**
+
+| Option | Description |
+|--------|-------------|
+| `-p, --port <number>` | Server port (default: `3456`) |
+| `--no-open` | Do not open browser automatically |
 
 ### Fetch Command
 
@@ -258,6 +280,27 @@ D3: { type: btn, value: "Submit", bg: $primary }
 - Cell references use Excel-style notation: `A1`, `B2`, `C3`
 - Range notation: `A1..B3` (top-left to bottom-right)
 
+### Unequal Grid Divisions
+
+Use `col-widths` and `row-heights` to set ratio-based sizes:
+
+```kui
+ratio: 16:9
+grid: 3x3
+col-widths: [1, 3, 1]
+row-heights: [1, 4, 1]
+gap: 8
+
+// Sidebar layout
+A1..C1: { type: txt, value: "Header", align: center, bg: "#3B82F6" }
+A2: { type: txt, value: "Menu", bg: "#f0f0f0" }
+B2: { type: box, bg: "#ffffff", border: "#ccc" }
+C2: { type: txt, value: "Info", bg: "#f0f0f0" }
+A3..C3: { type: txt, value: "Footer", align: center, bg: "#e0e0e0" }
+```
+
+Values are ratios, not pixels. `[1, 3, 1]` means the middle column is 3x wider than the sides. Omit for equal divisions (backward compatible).
+
 ### Gap & Padding
 
 ```kui
@@ -318,6 +361,22 @@ Color formats:
 - CSS color names: `red`, `blue`, `lightblue`, `orange`, etc.
 - Theme reference: `$name` (requires `colors:` definition)
 
+### Themes
+
+Built-in visual presets:
+
+```kui
+theme: clean
+```
+
+| Theme | Stroke | Radius | Font Size | Default BG |
+|-------|--------|--------|-----------|------------|
+| `default` | 2px | 8px | 24px | `#e0e0e0` |
+| `clean` | 1px | 4px | 20px | `#f0f0f0` |
+| `bold` | 3px | 12px | 28px | `#d0d0d0` |
+
+Per-component `bg` and `border` always override the theme.
+
 ### Alignment
 
 - `align`: `left` (default), `center`, `right`
@@ -361,8 +420,11 @@ The longest edge is fixed at 1280px. The shorter edge is calculated from the rat
 - [x] Core components (txt, box, btn, input, img)
 - [x] SVG/PNG export
 - [x] Web page to .kui conversion (`ktr fetch`)
+- [x] Live preview with watch mode (`ktr watch`)
+- [x] Unequal grid divisions (`col-widths`, `row-heights`)
+- [x] Built-in themes (default, clean, bold)
+- [x] HTML export with CSS Grid layout
 - [ ] Markdown embedding (` ```kui ` code blocks)
-- [ ] HTML export
 - [ ] VS Code extension
 - [ ] Web-based editor
 
@@ -386,6 +448,8 @@ This software uses the following open-source libraries:
 | [libvips](https://github.com/libvips/libvips) | LGPL-3.0-or-later | Image processing library (sharp dependency) |
 | [commander](https://github.com/tj/commander.js) | MIT | CLI argument parsing |
 | [node-html-parser](https://github.com/nicolewhite/node-html-parser) | MIT | HTML parsing for fetch command |
+| [ws](https://github.com/websockets/ws) | MIT | WebSocket server for watch mode |
+| [open](https://github.com/sindresorhus/open) | MIT | Open browser for watch mode |
 
 ## Acknowledgments
 
