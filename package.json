@@ -29,7 +29,7 @@
     "design"
   ],
   "author": "En-Links LLC",
-  "license": "AGPL-3.0-or-later",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/enlinks-llc/katsuragi.git"

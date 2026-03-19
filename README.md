@@ -3,7 +3,7 @@
 [日本語版 README](./README.ja.md)
 
 [![npm version](https://badge.fury.io/js/katsuragi.svg)](https://www.npmjs.com/package/katsuragi)
-[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Half the tokens. Twice the clarity.
 
@@ -430,13 +430,7 @@ The longest edge is fixed at 1280px. The shorter edge is calculated from the rat
 
 ## License
 
-- **Open Source**: AGPL-3.0 (free if you open-source your code)
-- **Commercial Products**: Free to use for building commercial products
-- **Commercial License Required**: Only when embedding Katsuragi into SaaS platforms or distributing as closed-source
-
-> **Example**: Using Katsuragi to create wireframes for your commercial app? Totally free. Integrating Katsuragi into your design tool SaaS? Commercial license required.
-
-For commercial licensing, contact [En-Links LLC](https://github.com/enlinks-llc).
+[MIT](LICENSE)
 
 ## Third-Party Licenses
 
