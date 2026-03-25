@@ -3,7 +3,7 @@
 [English README](./README.md)
 
 [![npm version](https://badge.fury.io/js/katsuragi.svg)](https://www.npmjs.com/package/katsuragi)
-[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## 半分のトークン。2倍の明確さ。
 
@@ -428,13 +428,7 @@ A1: { type: txt, value: `
 
 ## ライセンス
 
-- **オープンソース利用**: AGPL-3.0（ソースコードを公開するなら無料）
-- **商用製品の開発**: 無料で利用可能
-- **商用ライセンスが必要なケース**: SaaSへの組み込み、クローズドソースでの配布のみ
-
-> **例**: 商用アプリのワイヤーフレーム作成に使う → 無料。デザインツールSaaSにKatsuragiを組み込む → 商用ライセンスが必要。
-
-商用ライセンスについては [En-Links LLC](https://github.com/enlinks-llc) までお問い合わせください。
+[MIT](LICENSE)
 
 ## サードパーティライセンス
 
